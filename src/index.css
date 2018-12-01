@@ -1,0 +1,25 @@
+html{
+  min-height:  100%;
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: url(/img/backs.jpg) no-repeat;
+  background-size: 100%;
+  background-position: bottom;
+  min-height:  100%;
+/*  background-color: black;*/
+}
+
+form{
+  padding: 20px;
+  margin-top: 60px;
+  border-radius: 10px;
+}
+
+form button,form h5{
+  margin: 20px 0,
+}
