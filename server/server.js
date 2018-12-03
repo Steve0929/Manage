@@ -4,12 +4,14 @@ const morgan = require('morgan');
 const mongoose = require ('mongoose');
 const path = require ('path');
 const bodyParser = require ('body-parser');
+
 //const {mongoosed} = require ('database.js');
 
 // allow-cors
 app.use(function(req,res,next){
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   next();
 })
 app.use(morgan('dev'));
@@ -28,11 +30,9 @@ mongoose.connect(db).then (db=> console.log('Conectado a la db')).catch(er=>cons
 
 
 
-
-
 // catch 404
 app.use((req, res, next) => {
-  res.status(404).send('<h2 align=center>Page Not Found!</h2>');
+  res.status(404).send('<h2 align=center>Beep Bop...Error :(</h2>');
 });
 
 app.set('port', process.env.PORT || 3001)
