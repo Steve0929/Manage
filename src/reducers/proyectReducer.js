@@ -19,6 +19,7 @@ const proyectReducer = (state = initState , action) => {
 
     case 'ERROR_CREAR_PROYECTO':
           console.log('Error al crear el proyecto', action.err);
+          M.toast({html: 'Error al crear el proyecto'});
           return state;
 
     default:

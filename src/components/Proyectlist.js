@@ -1,17 +1,17 @@
-import React  from 'react';
+import React, { Component } from 'react';
 import ProyectSummary from './ProyectSummary'
 import {Link} from 'react-router-dom'
 
-const Proyectlist = ({proyects}) =>{
+
+const Proyectlist = (props) =>{
   return(
     <div className="proyectcss section">
-      { proyects && proyects.map(proyect =>{ //cycle por los proyectos
+      { props.proyects && props.proyects.map(proyect =>{ //cycle por los proyectos
         return (
-          <Link to={'/proyecto/'+proyect._id}>
-          <ProyectSummary proyect={proyect} key={proyect._id} />
+          <Link key={proyect._id} to={'/proyecto/'+proyect._id}>
+          <ProyectSummary proyect={proyect} key={proyect._id} delete={props.delete}/>
           </Link>
         )
-
       })}
     </div>
   )
