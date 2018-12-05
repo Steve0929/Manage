@@ -2,17 +2,33 @@ const express = require ('express');
 const router = express.Router();
 const passport = require ('passport');
 const ingreso = require('passport-local').Strategy;
-
+require('../passJWT');
+const jwt = require ('jsonwebtoken');
 const User = require ('../schemas/users.js');
 
+router.get('/api/test', passport.authenticate('jwt', { session: false }),
+    function(req, res) {
+        res.send(req.user);
+    }
+);
 
 router.post('/api/users/ingresar', function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err); }
-    if (!user) { return res.json({msg: 'Error. El usuario o contraseña no coinciden'}); } //error
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      return res.json({usuario: user, msg: 'Has ingresado a tu cuenta', status: 'ok'}); //Exito, devuelve el usuario
+    if (err){
+        return next(err);
+        }
+    if (!user){
+        return res.json({msg: 'Error. El usuario o contraseña no coinciden'});
+        }
+
+    req.logIn(user, {session: false}, (err) => {
+      if (err) {
+          return next(err);
+          }
+      const token = jwt.sign(user.toJSON(), 'secretforjwtxd', {
+            expiresIn: 15 //15s
+            });
+      return res.json({usuario: user, msg: 'Has ingresado a tu cuenta', status: 'ok', token: 'JWT '+token}); //Exito, devuelve el usuario
     });
   })(req, res, next);
 });
@@ -21,6 +37,12 @@ router.get('/api/users', async (req,res) =>{
   const usuarios = await User.find();
   res.json(usuarios);
 
+  }
+)
+
+router.get('/api/users/salir', async (req,res) =>{
+  req.logout();
+  res.json({msg: 'Has salido de tu cuenta', status: 'out'});
   }
 )
 

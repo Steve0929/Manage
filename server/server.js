@@ -7,15 +7,20 @@ const bodyParser = require ('body-parser');
 const session = require ('express-session');
 const passport = require ('passport');
 
+const cookieSession = require ('cookie-session');
+
 require('./pass');
 
 // allow-cors
 app.use(function(req,res,next){
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); //change for "*"
+  res.header("Access-Control-Allow-Credentials", "true"); //!!!
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   next();
 })
+
+
 
 //Middleware
 app.use(morgan('dev'));
@@ -28,9 +33,16 @@ var sess = {
   secret: 'bulletproof server',
   resave: true,
   saveUninitialized: true,
+  cookie: {
+        secure: false
+    }
 }
-app.use(session(sess));
-
+//app.use(session(sess));
+app.use(cookieSession({
+    name: 'proyectosReact',
+    keys: ['very secret key'],
+    maxAge: 15* 1000 //
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());

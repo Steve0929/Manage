@@ -2,7 +2,6 @@ const express = require ('express');
 const router = express.Router();
 const proyecto = require ('../schemas/proyectos.js');
 
-
 router.get('/', (req,res) =>{
   res.json({
     status: 'Beep Bop...'
@@ -20,7 +19,15 @@ router.get('/api/proyectos', async(req,res) =>{
 
 router.get('/api/proyectos/:id', async(req,res) =>{
       const unproyecto = await proyecto.findById(req.params.id);
-      res.json(unproyecto);
+      console.log(req.params);
+      res.json({proyect: unproyecto , logged: req.isAuthenticated()});
+  }
+)
+
+router.post('/api/isauth', async(req,res) =>{
+      console.log( req.isAuthenticated());
+      console.log(req.user);
+      res.json({logged: req.isAuthenticated(), loggedUser: req.user});
   }
 )
 
@@ -38,7 +45,6 @@ router.put('/api/proyectos/:id', async(req,res) =>{
       const {titulo,descripcion} = req.body;
       const proyectoActualizar = ({titulo,descripcion});
       await proyecto.findOneAndUpdate(req.params.id, proyectoActualizar);
-      res.json({ status: 'Beep Bop...Updated!'});
   }
 )
 

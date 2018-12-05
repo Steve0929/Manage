@@ -2,6 +2,7 @@ const mongoose = require ('mongoose');
 const moment = require('moment-timezone');
 const dateColombia = moment.tz(Date.now(), "America/Bogota");
 
+
 const {Schema} = mongoose;
 
 const proyectSchema = new Schema({
