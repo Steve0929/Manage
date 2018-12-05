@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ProyectSummary from './ProyectSummary'
 import {Link} from 'react-router-dom'
 

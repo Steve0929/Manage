@@ -18,10 +18,14 @@ componentDidMount(){
   this.getProyectById();
 }
 
+
 getProyectById(){
     fetch('http://localhost:3001/api/proyectos/'+id)
       .then(res => res.json())
-      .then(data => this.setState({proyecto: data}));
+      .then(data => {
+      console.log(data.logged);
+      this.setState({proyecto: data.proyect}) });
+      //.then(data => this.setState({proyecto: data}));
   }
 
 render(){

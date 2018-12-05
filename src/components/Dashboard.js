@@ -37,7 +37,6 @@ class Dashboard extends Component{
 
   render(){
     //console.log(this.props);
-    const { proyects } = this.props;
     return(
       <div className="dashcss container ">
         <div className="row">

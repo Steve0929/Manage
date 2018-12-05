@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import M from "materialize-css/dist/js/materialize.min.js";
 
 class Register extends Component{
   state = {
@@ -16,7 +17,19 @@ class Register extends Component{
   handleRegistrarme = (e) =>{
     e.preventDefault();
     console.log(this.state);
+    fetch('http://localhost:3001/api/users/registrarse', {
+          method: 'POST',
+          body: JSON.stringify(this.state),
+          headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'}
+    })
+    .then(res => res.json())
+    .then((res) => {
+          console.log(res);
+          M.toast({html: res.status});
+
+        });
   }
+
 
   render(){
     return(

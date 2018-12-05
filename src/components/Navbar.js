@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom'
 import InLinks from './Inlinks'
 import OutLinks from './OutLinks'
 
-const Navbar = () =>{
+const Navbar = (props) =>{
   return(
    <nav className= "nav-wrapper grey darken-3">
     <div className="container">

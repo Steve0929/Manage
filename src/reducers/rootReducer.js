@@ -1,10 +1,10 @@
-import loginReducer from './loginReducer'
 import proyectReducer from './proyectReducer'
+import authReducer from './authReducer'
 import {combineReducers} from 'redux'
 
 const rootReducer = combineReducers({
-      login: loginReducer,
-      proyect: proyectReducer
+      proyect: proyectReducer,
+      auth: authReducer
 })
 
 export default rootReducer;

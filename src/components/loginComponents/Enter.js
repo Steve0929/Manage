@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import M from "materialize-css/dist/js/materialize.min.js";
 
 class Enter extends Component{
   state = {
@@ -13,7 +14,31 @@ class Enter extends Component{
 
   handleEntrar = (e) =>{
     e.preventDefault();
-    console.log(this.state);
+    fetch('http://localhost:3001/api/users/ingresar', {
+          method: 'POST',
+          body: JSON.stringify(this.state),
+          headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
+          credentials: "include",
+    })
+    .then(res => res.json())
+    .then((res) => {
+          console.log(res);
+          M.toast({html: res.msg}); //res.msg
+        });
+  }
+
+checkAuth = () =>{
+    fetch('http://localhost:3001/api/isauth', {
+        method: 'POST',
+        body: JSON.stringify(this.state),
+        headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
+        credentials: "include",
+    })
+    .then(res => res.json())
+    .then((res) => {
+          console.log(res.logged);
+        });
+
   }
 
   render(){
@@ -33,6 +58,7 @@ class Enter extends Component{
             <button className="btn pink lighten-1 z-depth-1"> Ingresar </button>
           </div>
          </form>
+          <button onClick={this.checkAuth} className="btn pink lighten-1 z-depth-1"> TEST! </button>
         </div>
     );
   }
