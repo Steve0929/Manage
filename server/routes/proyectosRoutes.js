@@ -1,6 +1,8 @@
 const express = require ('express');
 const router = express.Router();
 const proyecto = require ('../schemas/proyectos.js');
+require('../passJWT');
+const passport = require ('passport');
 
 router.get('/', (req,res) =>{
   res.json({
@@ -9,20 +11,32 @@ router.get('/', (req,res) =>{
   }
 )
 
+//, passport.authenticate('jwt', { session: false }),
 
-router.get('/api/proyectos', async(req,res) =>{
-      const proyectos = await proyecto.find();
-      console.log(proyectos);
-      res.json(proyectos);
-  }
-)
+router.get('/api/proyectos/', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    const proyectos = await proyecto.find();
+    res.json({proyectos: proyectos , auth: 'true'});
+  })(req, res, next);
+});
 
-router.get('/api/proyectos/:id', async(req,res) =>{
-      const unproyecto = await proyecto.findById(req.params.id);
-      console.log(req.params);
-      res.json({proyect: unproyecto , logged: req.isAuthenticated()});
-  }
-)
+
+router.get('/api/proyectos/:id', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    const unproyecto = await proyecto.findById(req.params.id);
+    console.log(req.isAuthenticated());
+    res.json({proyect: unproyecto , auth: 'true'});
+  })(req, res, next);
+});
+
 
 router.post('/api/isauth', async(req,res) =>{
       console.log( req.isAuthenticated());
