@@ -1,4 +1,5 @@
 import React, { Component }  from 'react';
+import {Redirect} from 'react-router-dom'
 
 var id = 'null';
 
@@ -11,7 +12,8 @@ constructor(props){
 }
 
 state = {
-  proyecto : []
+  proyecto : [],
+  auth: null
 }
 
 componentDidMount(){
@@ -20,15 +22,29 @@ componentDidMount(){
 
 
 getProyectById(){
-    fetch('http://localhost:3001/api/proyectos/'+id)
+    var currentToken = sessionStorage.getItem('accesToken');
+    if(currentToken){
+    fetch('http://localhost:3001/api/proyectos/'+id , { headers: {'Authorization': currentToken}})
       .then(res => res.json())
       .then(data => {
-      console.log(data.logged);
-      this.setState({proyecto: data.proyect}) });
-      //.then(data => this.setState({proyecto: data}));
+      if(data.auth === 'true'){
+         this.setState({proyecto: data.proyect, auth: true})
+         }
+      else{
+        this.setState({auth: false}) //Token is not valid
+        console.log(data.auth, data.info);
+      }
+    });
+    }
+    else{
+      this.setState({auth: false}) //No token in session
+      console.log("No autenticado, redirreccionar...");
+    }
   }
 
 render(){
+  if(this.state.auth === false) return <Redirect to = '/'/>
+  if(this.state.auth === null) return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
   return(
     <div className="container section projectInfo">
       <div className="card z-depth 1">

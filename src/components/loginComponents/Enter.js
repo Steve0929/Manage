@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import M from "materialize-css/dist/js/materialize.min.js";
+import {Redirect} from 'react-router-dom'
 
 class Enter extends Component{
+
   state = {
     email: '',
-    password: ''
+    password: '',
+    auth: null
 
   }
 
@@ -18,12 +21,16 @@ class Enter extends Component{
           method: 'POST',
           body: JSON.stringify(this.state),
           headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
-          credentials: "include",
     })
     .then(res => res.json())
     .then((res) => {
           console.log(res);
           M.toast({html: res.msg}); //res.msg
+          if(res.auth == 'true'){
+             sessionStorage.setItem('accesToken', res.token); //Save token
+             this.setState({auth: true});
+             this.props.updateNavIn();
+          }
         });
   }
 
@@ -42,6 +49,7 @@ checkAuth = () =>{
   }
 
   render(){
+    if(this.state.auth === true) return <Redirect to = '/dashboard'/>
     return(
       <div className="container ">
          <form onSubmit={this.handleEntrar} className="white">
@@ -58,7 +66,6 @@ checkAuth = () =>{
             <button className="btn pink lighten-1 z-depth-1"> Ingresar </button>
           </div>
          </form>
-          <button onClick={this.checkAuth} className="btn pink lighten-1 z-depth-1"> TEST! </button>
         </div>
     );
   }

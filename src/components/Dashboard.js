@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import Notifications from './Notifications'
 import Proyectlist from './Proyectlist'
 import M from "materialize-css/dist/js/materialize.min.js";
+import {Redirect} from 'react-router-dom'
 //import {connect} from 'react-redux'
 
 
 class Dashboard extends Component{
   state = {
-    proyects : []
+    proyects : [],
+    auth: null
   }
 
   componentDidMount(){ //apenas cargue se ejecuta
@@ -15,11 +17,20 @@ class Dashboard extends Component{
     this.getProyectos();
   }
 
-  getProyectos(){
-      fetch('http://localhost:3001/api/proyectos')
+getProyectos(){
+      var currentToken = sessionStorage.getItem('accesToken');
+      fetch('http://localhost:3001/api/proyectos', { headers: {'Authorization': currentToken}})
         .then(res => res.json())
-        .then(data => this.setState({proyects: data}))
-    }
+        .then(data =>{
+          if(data.auth === 'true'){
+             this.setState({proyects: data.proyectos, auth: true})
+             }
+          else{
+            this.setState({auth: false}) //Token is not valid
+          }
+        });
+}
+
 
   borrarProyecto = (e, deleteProyectId) =>{
     e.preventDefault();
@@ -37,6 +48,9 @@ class Dashboard extends Component{
 
   render(){
     //console.log(this.props);
+    console.log(this.state);
+    if(this.state.auth === false) return <Redirect to = '/registrarme'/>
+    if(this.state.auth === null) return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
     return(
       <div className="dashcss container ">
         <div className="row">

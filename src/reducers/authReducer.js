@@ -1,18 +1,17 @@
 const initState = {
-  error: null
-
+  auth: null
 }
 
 const authReducer = (state = initState , action) => {
   switch(action.type){
     case 'NOT LOGGED':
         return {
-          ...state, error: 'error'
+          ...state, auth: 'false'
         }
     case 'LOGGED':
       console.log('LOGIN SUCCES')
       return {
-        ...state, error: 'null'
+        ...state, auth: 'true'
       }
 
     default:

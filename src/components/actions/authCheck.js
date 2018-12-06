@@ -5,7 +5,7 @@ export const authCheck = (credenciales) =>{
         method: 'POST',
         body: JSON.stringify(credenciales),
         headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
-        credentials: "include",
+        
     })
     .then(res => res.json())
     .then((res) => {

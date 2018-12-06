@@ -11,18 +11,32 @@ import Enter from './components/loginComponents/Enter'
 import CreateProyect from './components/loginComponents/CreateProyect'
 
 
-
 class App extends Component{
+  state = {
+    auth: false
+  }
+
+  updateNavbarIn(){
+    console.log('gdfg');
+    this.setState({auth: true});
+  }
+
+  updateNavbarOut(){
+    localStorage.removeItem("accesToken");
+    this.setState({auth: false});
+  }
+
   render(){
     return(
       <BrowserRouter>
       <div className="App">
-        <Navbar/>
+        <Navbar auth={this.state.auth} updateNavbarOut={this.updateNavbarOut.bind(this)} />
         <Switch>
-         <Route exact path='/' component={Dashboard} />
+         <Route exact path='/' />
+         <Route path='/dashboard' component={Dashboard} />
          <Route path='/proyecto/:id' component={ProyectComp} />
          <Route path='/registrarme' component={Register} />
-         <Route path='/ingresar' component={Enter} />
+         <Route path='/ingresar' render={()=><Enter updateNavIn={this.updateNavbarIn.bind(this)} />}/>
          <Route path='/crear' component={CreateProyect} />
          </Switch>
 
