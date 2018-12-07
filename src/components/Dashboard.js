@@ -3,21 +3,24 @@ import Notifications from './Notifications'
 import Proyectlist from './Proyectlist'
 import M from "materialize-css/dist/js/materialize.min.js";
 import {Redirect} from 'react-router-dom'
-//import {connect} from 'react-redux'
-
+import {connect} from 'react-redux'
+import {getProyects} from './actions/proyectActions'
+import {borrarProyect} from './actions/proyectActions'
 
 class Dashboard extends Component{
-  state = {
-    proyects : [],
-    auth: null
-  }
+
 
   componentDidMount(){ //apenas cargue se ejecuta
     console.log('montado');
-    this.getProyectos();
+    this.props.getProyectsRedux();
+    //this.getProyectos();
   }
 
-getProyectos(){
+  logOutUpdateState(){
+    this.setState({auth: false});
+  }
+/*
+  getProyectos(){
       var currentToken = sessionStorage.getItem('accesToken');
       fetch('http://localhost:3001/api/proyectos', { headers: {'Authorization': currentToken}})
         .then(res => res.json())
@@ -29,7 +32,7 @@ getProyectos(){
             this.setState({auth: false}) //Token is not valid
           }
         });
-}
+    }
 
 
   borrarProyecto = (e, deleteProyectId) =>{
@@ -45,17 +48,23 @@ getProyectos(){
                    this.getProyectos();
                  });
   }
+  */
+
+  handleBorrarProyecto = (e, deleteProyectId) => {
+    e.preventDefault();
+    this.props.borrarProyectoRedux(deleteProyectId);
+  }
 
   render(){
-    //console.log(this.props);
-    console.log(this.state);
-    if(this.state.auth === false) return <Redirect to = '/registrarme'/>
-    if(this.state.auth === null) return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
+    console.log(this.props);
+    if(this.props.authRedux.auth === false) {return <Redirect to = '/registrarme'/>}
+    if(this.props.authRedux.auth === null )
+      {return  (<div className="progress"><div className="indeterminate"></div></div>)} //loading...
     return(
       <div className="dashcss container ">
         <div className="row">
           <div className="col s12 m6">
-           <Proyectlist proyects = {this.state.proyects} delete={this.borrarProyecto}/>
+           <Proyectlist proyects = {this.props.proyectsRedux.proyects} delete={this.handleBorrarProyecto}/>
            </div>
           <div className="col s12 m5 offset-m1"> </div>
             <Notifications/>
@@ -65,12 +74,19 @@ getProyectos(){
   }
 }
 
-
-const mapStateProps = (state) =>  {
+const mapStateToProps = (state) =>{
+   console.log(state);
   return{
-    proyects: state.dd
+    authRedux: state.auth,
+    proyectsRedux: state.proyects
   }
 }
 
+const mapDispatchToProps = (dispatch) =>{
+  return{
+    getProyectsRedux: () => dispatch(getProyects()),
+    borrarProyectoRedux: (deleteProyectId) => dispatch(borrarProyect(deleteProyectId))
+  }
+}
 
-export default Dashboard;
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

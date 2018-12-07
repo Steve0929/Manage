@@ -2,15 +2,17 @@ import React  from 'react';
 import {Link} from 'react-router-dom'
 import InLinks from './Inlinks'
 import OutLinks from './OutLinks'
+import {connect} from 'react-redux'
+
 //import {connect} from 'react-redux'
 
 const Navbar = (props) =>{
-  console.log(props)
+  //console.log(props.authRedux)
   var links;
-  if(props.auth === false){
+  if(props.authRedux.auth === null || props.authRedux.auth === false){
      links = <OutLinks/>
   }
-  if(props.auth === true){
+  if(props.authRedux.auth === true){
      links = <InLinks updateNavbarOut={props.updateNavbarOut}/>
   }
   return(
@@ -23,5 +25,11 @@ const Navbar = (props) =>{
   )
 }
 
+const mapStateToProps = (state) =>{
+    return{
+      authRedux: state.auth
+    }
+}
 
-export default Navbar;
+
+export default connect(mapStateToProps)(Navbar);

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import M from "materialize-css/dist/js/materialize.min.js";
 import {Redirect} from 'react-router-dom'
+import {connect} from 'react-redux'
+import {ingresar} from '../actions/authCheck'
 
 class Enter extends Component{
 
@@ -8,51 +10,23 @@ class Enter extends Component{
     email: '',
     password: '',
     auth: null
-
   }
 
   handleChange = (e) =>{
     this.setState({ [e.target.id] : e.target.value}) //id of input
   }
 
-  handleEntrar = (e) =>{
+  handleReduxLogin = (e) =>{
     e.preventDefault();
-    fetch('http://localhost:3001/api/users/ingresar', {
-          method: 'POST',
-          body: JSON.stringify(this.state),
-          headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
-    })
-    .then(res => res.json())
-    .then((res) => {
-          console.log(res);
-          M.toast({html: res.msg}); //res.msg
-          if(res.auth == 'true'){
-             sessionStorage.setItem('accesToken', res.token); //Save token
-             this.setState({auth: true});
-             this.props.updateNavIn();
-          }
-        });
+    this.props.ingresoRedux(this.state)
   }
 
-checkAuth = () =>{
-    fetch('http://localhost:3001/api/isauth', {
-        method: 'POST',
-        body: JSON.stringify(this.state),
-        headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'},
-        credentials: "include",
-    })
-    .then(res => res.json())
-    .then((res) => {
-          console.log(res.logged);
-        });
-
-  }
 
   render(){
-    if(this.state.auth === true) return <Redirect to = '/dashboard'/>
+    if(this.props.authRedux.auth === true) return <Redirect to = '/dashboard'/>
     return(
       <div className="container ">
-         <form onSubmit={this.handleEntrar} className="white">
+         <form onSubmit={this.handleReduxLogin} className="white">
           <h5 className="grey-text text-darken-3"> Ingresar </h5>
           <div className="input-field">
             <label htmlFor="email"> Email </label>
@@ -70,4 +44,17 @@ checkAuth = () =>{
     );
   }
 }
-export default Enter;
+
+const mapDispatchToProps = (dispatch) =>{
+  return{
+    ingresoRedux: (credentials) => dispatch(ingresar(credentials))
+  }
+}
+
+const mapStateToProps = (state) =>{
+  return{
+    authRedux: state.auth,
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Enter);
