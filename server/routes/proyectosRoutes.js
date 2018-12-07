@@ -33,7 +33,7 @@ router.get('/api/proyectos/:id', function(req, res, next) {
     //Succes:
     const unproyecto = await proyecto.findById(req.params.id);
     console.log(req.isAuthenticated());
-    res.json({proyect: unproyecto , auth: 'true'});
+    res.json({proyecto: unproyecto , auth: 'true'});
   })(req, res, next);
 });
 
@@ -62,11 +62,18 @@ router.put('/api/proyectos/:id', async(req,res) =>{
   }
 )
 
-router.delete('/api/proyectos/:id', async(req,res) =>{
-      await proyecto.findByIdAndRemove(req.params.id);
-      res.json({ status: 'Beep Bop...Deleted!'});
-  }
-)
+
+router.delete('/api/proyectos/:id', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    await proyecto.findByIdAndRemove(req.params.id);
+    const updatedProyects = await proyecto.find();
+    res.json({eliminado: 'true' , auth: 'true', updatedProyects: updatedProyects});
+  })(req, res, next);
+});
 
 
 module.exports = router;

@@ -26,7 +26,7 @@ router.post('/api/users/ingresar', function(req, res, next) {
           return next(err);
           }
       const token = jwt.sign(user.toJSON(), 'secretforjwtxd', {
-            expiresIn: 65 //35s
+            expiresIn: 45 //35s
             });
       return res.json({usuario: user, msg: 'Has ingresado a tu cuenta', auth: 'true', token: 'JWT '+token}); //Exito, devuelve el usuario
     });
