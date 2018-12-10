@@ -1,17 +1,37 @@
 import M from "materialize-css/dist/js/materialize.min.js";
+
+
 export const createProyect = (proyect) =>{
   return (dispatch, getState) => {
+      var currentToken = sessionStorage.getItem('accesToken');
+      const creatorInfo = getState().auth.user;
+      const nombre = creatorInfo.nombre;
+      const apellido = creatorInfo.apellido;
+      const id = creatorInfo._id;
+      const time = Date.now();
+      var newProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
+                        creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time}
+      console.log(newProyect);
       //async call to post data
       fetch('http://localhost:3001/api/crearproyecto', {
             method: 'POST',
-            body: JSON.stringify(proyect),
-            headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'}
+            body: JSON.stringify(newProyect),
+            headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}
 
       })
-        .then(res=> res.json()).then(data => console.log(data)).then(() => dispatch({type: 'CREAR_PROYECTO', proyect}))
-        .catch(err=> dispatch({type: 'ERROR_CREAR_PROYECTO', err}));
-  }
-};
+      .then(res => res.json())
+      .then(data =>{
+        if(data.auth === 'true' && data.creado === 'true'){
+
+           dispatch({type: 'PROYECTO CREADO'});
+           }
+        else{
+           dispatch({type: 'NOT LOGGED'});
+           dispatch({type: 'ERROR_CREAR_PROYECTO'}); //Token is not valid
+        }
+      });
+    }
+}
 
 export const getProyects = () =>{
   return (dispatch, getState) =>{

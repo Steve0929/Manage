@@ -1,26 +1,28 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import {createProyect} from '../actions/proyectActions'
+import {Redirect} from 'react-router-dom'
 
 class CreateProyect extends Component{
   state = {
     titulo: '',
-    descripcion: '',
-    creador: 'Steve', creadorId: '3813', timeStamp: ''
+    descripcion: ''
   }
 
   handleChange = (e) =>{
     this.setState({ [e.target.id] : e.target.value}) //id of input
-    this.setState({ timeStamp : new Date()});
   }
 
   handleCrear = (e) =>{
     e.preventDefault();
     this.props.createProyect(this.state)
+    this.props.history.push('/dashboard');
     //console.log(this.state);
   }
 
   render(){
+    if(this.props.authRedux.auth === false) return <Redirect to = '/'/>
+    if(this.props.authRedux.auth === null) return <Redirect to = '/'/>
     return(
       <div className="container ">
          <form onSubmit={this.handleCrear} className="white">
@@ -42,10 +44,17 @@ class CreateProyect extends Component{
   }
 }
 
+const mapStateToProps = (state) =>{
+  return{
+    authRedux: state.auth,
+    currentUserRedux: state.auth.user
+  }
+}
+
 const mapDispatchToProps = (dispatch) =>{
   return{
     createProyect: (proyect) => dispatch(createProyect(proyect))
   }
 }
 
-export default connect(null, mapDispatchToProps)(CreateProyect);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProyect);

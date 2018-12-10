@@ -7,7 +7,7 @@ const initState = {
 
 const proyectReducer = (state = initState , action) => {
   switch (action.type){
-    case 'CREAR_PROYECTO': console.log("Proyecto creado", action.proyect);
+    case 'PROYECTO CREADO': console.log("Proyecto creado", action.proyect);
           M.toast({html: 'Proyecto creado!'});
           return state;
 

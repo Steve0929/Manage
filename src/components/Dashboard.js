@@ -75,10 +75,10 @@ class Dashboard extends Component{
 }
 
 const mapStateToProps = (state) =>{
-   console.log(state);
   return{
     authRedux: state.auth,
-    proyectsRedux: state.proyects
+    proyectsRedux: state.proyects,
+    currentUserRedux: state.auth.user
   }
 }
 

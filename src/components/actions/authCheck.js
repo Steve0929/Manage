@@ -9,11 +9,12 @@ export const ingresar = (credenciales) =>{
     })
     .then(res => res.json())
     .then((res) => {
-          console.log(res);
+          console.log('Respuesta server'+res);
           M.toast({html: res.msg}); //res.msg
-          if(res.auth === 'true'){
+          if(res.auth === 'true' && res.user){
               sessionStorage.setItem('accesToken', res.token); //Save token
-              dispatch({type: 'LOGGED'});
+              var user = res.user;
+              dispatch({type: 'LOGGED', user});
           }
           else{
             dispatch({type: 'NOT LOGGED'});
