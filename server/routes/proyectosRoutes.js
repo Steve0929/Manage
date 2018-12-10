@@ -38,21 +38,20 @@ router.get('/api/proyectos/:id', function(req, res, next) {
 });
 
 
-router.post('/api/isauth', async(req,res) =>{
-      console.log( req.isAuthenticated());
-      console.log(req.user);
-      res.json({logged: req.isAuthenticated(), loggedUser: req.user});
-  }
-)
 
-router.post('/api/crearproyecto', async(req,res) =>{
-      console.log(req.body);
-      const {titulo, descripcion,creador,creadorId,timeStamp} = req.body;
-      const proyectoAñadir = new proyecto({titulo,descripcion,creador,creadorId,timeStamp});
-      await proyectoAñadir.save();
-      res.json({ status: 'Beep Bop...Success!'});
-  }
-)
+router.post('/api/crearproyecto', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    console.log(req.body);
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp} = req.body;
+    const proyectoAñadir = new proyecto({titulo,descripcion,creadorNombre,creadorApellido,creadorId,timeStamp});
+    await proyectoAñadir.save();
+    res.json({auth: 'true', creado: 'true'});
+  })(req, res, next);
+});
 
 
 router.put('/api/proyectos/:id', async(req,res) =>{

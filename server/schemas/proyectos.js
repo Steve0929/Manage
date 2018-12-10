@@ -8,7 +8,8 @@ const {Schema} = mongoose;
 const proyectSchema = new Schema({
     titulo: {type: String, required: true},
     descripcion: {type: String, required: true},
-    creador: {type: String, required: true},
+    creadorNombre: {type: String, required: true},
+    creadorApellido: {type: String, required: true},
     creadorId: {type: String, required: true},
     timeStamp: {type : Date, required: true},
 
