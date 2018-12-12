@@ -12,6 +12,8 @@ const proyectSchema = new Schema({
     creadorApellido: {type: String, required: true},
     creadorId: {type: String, required: true},
     timeStamp: {type : Date, required: true},
+    avance: {type: Number, default: 0, require: true },
+    acciones: [{titulo: String, accion: String, estado: Number}]
 
 });
 
