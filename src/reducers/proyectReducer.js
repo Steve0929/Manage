@@ -22,13 +22,13 @@ const proyectReducer = (state = initState , action) => {
           }
 
    case 'CANT GET PROYECTS':
-    M.toast({html: 'No se cargaron proyectos'});
+         M.toast({html: 'No se cargaron proyectos'});
          return {
          proyects: []
          }
 
     case 'GOT PROYECT BY ID':
-          M.toast({html: 'GOT PROYECT'});
+        //  M.toast({html: 'GOT PROYECT'});
           return {
           ...state, unproyecto: action.unproyecto
           }
@@ -47,6 +47,18 @@ const proyectReducer = (state = initState , action) => {
           M.toast({html: 'No se pudo eliminar el proyecto'});
           return {
           ...state, proyects: []
+          }
+
+    case 'PROYECTO ACTUALIZADO':
+          M.toast({html: 'Se ha actualizado correctamente'});
+          return {
+          ...state, unproyecto: action.updatedProyect
+          }
+
+    case 'ERROR AL ACTUALIZAR':
+          M.toast({html: 'Hubo un problema al actualizar'});
+          return {
+          ...state
           }
 
     default:

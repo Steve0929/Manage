@@ -10,7 +10,7 @@ export const createProyect = (proyect) =>{
       const id = creatorInfo._id;
       const time = Date.now();
       var newProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
-                        creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time}
+                        creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time, avance: 0}
       console.log(newProyect);
       //async call to post data
       fetch('http://localhost:3001/api/crearproyecto', {
@@ -32,6 +32,36 @@ export const createProyect = (proyect) =>{
       });
     }
 }
+
+export const updateProyect = (proyect) =>{
+  return (dispatch, getState) => {
+      var currentToken = sessionStorage.getItem('accesToken');
+      const time = Date.now();
+      var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
+                            creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
+                            creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: 30,
+                            acciones: proyect.acciones
+                            }
+      //async call to post data
+      fetch('http://localhost:3001/api/proyectos/'+proyect._id, {
+            method: 'PUT',
+            body: JSON.stringify(updatedProyect),
+            headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}
+
+      })
+      .then(res => res.json())
+      .then(data =>{
+        if(data.auth === 'true' && data.actualizado === 'true'){
+           const updatedProyect = data.proyecto
+           dispatch({type: 'PROYECTO ACTUALIZADO', updatedProyect});
+           }
+        else{
+           dispatch({type: 'ERROR AL ACTUALIZAR'});
+        }
+      });
+    }
+}
+
 
 export const getProyects = () =>{
   return (dispatch, getState) =>{
