@@ -2,7 +2,7 @@ import M from "materialize-css/dist/js/materialize.min.js";
 
 const initState = {
   proyects: [],
-  unproyecto: []
+  unproyecto: null
 }
 
 const proyectReducer = (state = initState , action) => {
