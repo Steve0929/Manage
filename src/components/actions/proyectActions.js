@@ -1,7 +1,7 @@
 import M from "materialize-css/dist/js/materialize.min.js";
+import { BrowserRouter } from 'react-router-dom'
 
-
-export const createProyect = (proyect) =>{
+export const createProyect = (proyect, redir) =>{
   return (dispatch, getState) => {
       var currentToken = sessionStorage.getItem('accesToken');
       const creatorInfo = getState().auth.user;
@@ -22,8 +22,8 @@ export const createProyect = (proyect) =>{
       .then(res => res.json())
       .then(data =>{
         if(data.auth === 'true' && data.creado === 'true'){
-
            dispatch({type: 'PROYECTO CREADO'});
+           redir.push('/dashboard');
            }
         else{
            dispatch({type: 'NOT LOGGED'});
@@ -39,7 +39,7 @@ export const updateProyect = (proyect) =>{
       const time = Date.now();
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
-                            creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: 30,
+                            creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
                             acciones: proyect.acciones
                             }
       //async call to post data
@@ -80,6 +80,35 @@ export const getProyects = () =>{
       });
   }
 }
+
+
+/////////!!!
+export const getProyectsOfUser = () =>{
+  return (dispatch, getState) =>{
+    var currentToken = sessionStorage.getItem('accesToken');
+    const user = getState().auth.user;
+    console.log(user);
+    fetch('http://localhost:3001/api/proyectos',
+            {
+            method: 'POST',
+            body: JSON.stringify(user),
+            headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}
+            })
+      .then(res => res.json())
+      .then(data =>{
+        if(data.auth === 'true' && data.proyectos){
+           var proyectos = data.proyectos;
+           dispatch({type: 'GOT PROYECTS', proyectos });
+           }
+        else{
+           dispatch({type: 'NOT LOGGED'});
+           dispatch({type: 'CANT GET PROYECTS'}); //Token is not valid
+        }
+      });
+  }
+}
+/////!!
+
 
 export const getProyectById = (id) =>{
   return (dispatch, getState) =>{

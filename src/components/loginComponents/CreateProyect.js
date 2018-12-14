@@ -15,9 +15,9 @@ class CreateProyect extends Component{
 
   handleCrear = (e) =>{
     e.preventDefault();
-    this.props.createProyect(this.state)
-    this.props.history.push('/dashboard');
-    //console.log(this.state);
+    var redir = this.props.history;
+    this.props.createProyect(this.state, redir)
+    //this.props.history.push('/dashboard');
   }
 
   render(){
@@ -53,7 +53,7 @@ const mapStateToProps = (state) =>{
 
 const mapDispatchToProps = (dispatch) =>{
   return{
-    createProyect: (proyect) => dispatch(createProyect(proyect))
+    createProyect: (proyect, redir) => dispatch(createProyect(proyect, redir))
   }
 }
 

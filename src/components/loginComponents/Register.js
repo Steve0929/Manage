@@ -6,8 +6,8 @@ class Register extends Component{
     email: '',
     password: '',
     nombre: '',
-    apellido: ''
-
+    apellido: '',
+    timeStamp: Date.now(),
   }
 
   handleChange = (e) =>{

@@ -6,49 +6,21 @@ import {Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {getProyects} from './actions/proyectActions'
 import {borrarProyect} from './actions/proyectActions'
+import {getProyectsOfUser} from './actions/proyectActions'
 
 class Dashboard extends Component{
 
 
   componentDidMount(){ //apenas cargue se ejecuta
     console.log('montado');
-    this.props.getProyectsRedux();
-    //this.getProyectos();
+    //this.props.getProyectsRedux();
+    this.props.getProyectsOfUser();
   }
 
   logOutUpdateState(){
     this.setState({auth: false});
   }
-/*
-  getProyectos(){
-      var currentToken = sessionStorage.getItem('accesToken');
-      fetch('http://localhost:3001/api/proyectos', { headers: {'Authorization': currentToken}})
-        .then(res => res.json())
-        .then(data =>{
-          if(data.auth === 'true'){
-             this.setState({proyects: data.proyectos, auth: true})
-             }
-          else{
-            this.setState({auth: false}) //Token is not valid
-          }
-        });
-    }
 
-
-  borrarProyecto = (e, deleteProyectId) =>{
-    e.preventDefault();
-    console.log('Eliminar: '+deleteProyectId);
-    fetch('http://localhost:3001/api/proyectos/'+deleteProyectId, {
-          method: 'DELETE',
-          headers: {'Content-Type' : 'application/json', 'Accept': 'application/json'}
-    })
-    .then(res => res.json())
-    .then(data => {console.log(data);
-                   M.toast({html: 'Proyecto eliminado'+deleteProyectId});
-                   this.getProyectos();
-                 });
-  }
-  */
 
   handleBorrarProyecto = (e, deleteProyectId) => {
     e.preventDefault();
@@ -85,7 +57,8 @@ const mapStateToProps = (state) =>{
 const mapDispatchToProps = (dispatch) =>{
   return{
     getProyectsRedux: () => dispatch(getProyects()),
-    borrarProyectoRedux: (deleteProyectId) => dispatch(borrarProyect(deleteProyectId))
+    borrarProyectoRedux: (deleteProyectId) => dispatch(borrarProyect(deleteProyectId)),
+    getProyectsOfUser: () => dispatch(getProyectsOfUser())
   }
 }
 
