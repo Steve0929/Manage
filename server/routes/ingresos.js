@@ -25,9 +25,9 @@ router.post('/api/users/ingresar', function(req, res, next) {
       if (err) {
           return next(err);
           }
-      const token = jwt.sign(user.toJSON(), 'secretforjwtxd', {
-            expiresIn: 245 //35s
-            });
+    const token = jwt.sign(user.toJSON(), 'secretforjwtxd', {
+          expiresIn: 245 //35s
+          });
       return res.json({user: user, msg: 'Has ingresado a tu cuenta', auth: 'true', token: 'JWT '+token}); //Exito, devuelve el usuario
     });
   })(req, res, next);
@@ -49,7 +49,7 @@ router.get('/api/users/salir', async (req,res) =>{
 )
 
 router.post('/api/users/registrarse', async (req,res) =>{
-  const {nombre, apellido, email, password} = req.body;
+  const {nombre, apellido, email, password,timeStamp} = req.body;
   const errors = [];
   if(nombre.length <=0){
     errors.push({status: 'Error. Inserta un nombre'});
@@ -71,7 +71,7 @@ router.post('/api/users/registrarse', async (req,res) =>{
     }
 
   if(errors.length == 0){
-    const newUser = new User({nombre,apellido,email,password});
+    const newUser = new User({nombre,apellido,email,password,timeStamp});
     newUser.password = await newUser.encriptarPass(password);
     await newUser.save();
     res.json({
