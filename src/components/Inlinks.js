@@ -6,7 +6,7 @@ import {logOut} from './actions/authCheck'
 const inLinks = (props) =>{
   return(
     <ul className="right">
-      <li> <NavLink to='/crear'>New Project</NavLink> </li>
+      <li> <NavLink to='/crear'>Nuevo Proyecto</NavLink> </li>
       <li> <a onClick={props.salir}>Log out</a> </li>
       <li> <NavLink to='/' className ="btn btn-floating pink light-1">NN</NavLink> </li>
     </ul>

@@ -26,7 +26,7 @@ class Register extends Component{
     .then((res) => {
           console.log(res);
           M.toast({html: res.status});
-
+          this.props.history.push('/ingresar');
         });
   }
 

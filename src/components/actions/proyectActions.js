@@ -9,8 +9,10 @@ export const createProyect = (proyect, redir) =>{
       const apellido = creatorInfo.apellido;
       const id = creatorInfo._id;
       const time = Date.now();
+      const involucrado = {nombre: nombre, apellido: apellido, identifier: id}
       var newProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
-                        creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time, avance: 0}
+                        creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time, avance: 0,
+                        involucrados: involucrado}
       console.log(newProyect);
       //async call to post data
       fetch('http://localhost:3001/api/crearproyecto', {
@@ -40,7 +42,7 @@ export const updateProyect = (proyect) =>{
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
-                            acciones: proyect.acciones
+                            acciones: proyect.acciones, involucrados: proyect.involucrados
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectos/'+proyect._id, {
@@ -62,7 +64,36 @@ export const updateProyect = (proyect) =>{
     }
 }
 
+export const añadirUsuario = (proyect, email) =>{
+  return (dispatch, getState) => {
+      var currentToken = sessionStorage.getItem('accesToken');
+      const time = Date.now();
+      var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
+                            creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
+                            creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
+                            acciones: proyect.acciones, involucrados: proyect.involucrados, newEmail: email
+                            }
+      //async call to post data
+      fetch('http://localhost:3001/api/proyectosadduser/'+proyect._id, {
+            method: 'PUT',
+            body: JSON.stringify(updatedProyect),
+            headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}
 
+      })
+      .then(res => res.json())
+      .then(data =>{
+        if(data.auth === 'true' && data.actualizado === 'true'){
+           const updatedProyect = data.proyecto
+           dispatch({type: 'PROYECTO ACTUALIZADO', updatedProyect});
+           }
+        else{
+           dispatch({type: 'ERROR AL ACTUALIZAR'});
+        }
+      });
+    }
+}
+
+/*
 export const getProyects = () =>{
   return (dispatch, getState) =>{
     var currentToken = sessionStorage.getItem('accesToken');
@@ -80,9 +111,9 @@ export const getProyects = () =>{
       });
   }
 }
+*/
 
 
-/////////!!!
 export const getProyectsOfUser = () =>{
   return (dispatch, getState) =>{
     var currentToken = sessionStorage.getItem('accesToken');
@@ -107,7 +138,7 @@ export const getProyectsOfUser = () =>{
       });
   }
 }
-/////!!
+
 
 
 export const getProyectById = (id) =>{
@@ -132,7 +163,12 @@ export const getProyectById = (id) =>{
 export const borrarProyect = (deleteProyectId) =>{
   return (dispatch, getState) =>{
     var currentToken = sessionStorage.getItem('accesToken');
-    fetch('http://localhost:3001/api/proyectos/'+deleteProyectId, {method: 'DELETE', headers: {'Authorization': currentToken}})
+    const creatorInfo = getState().auth.user;
+    const id = creatorInfo._id;
+    const idJson = {userId: id};
+    fetch('http://localhost:3001/api/proyectos/'+deleteProyectId, {
+          method: 'DELETE', body: JSON.stringify(idJson), headers: {'Authorization': currentToken}
+          })
       .then(res => res.json())
       .then(data =>{
         if(data.auth === 'true' && data.eliminado === 'true'){
