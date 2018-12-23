@@ -13,7 +13,8 @@ const proyectSchema = new Schema({
     creadorId: {type: String, required: true},
     timeStamp: {type : Date, required: true},
     avance: {type: Number, default: 0, require: true },
-    acciones: [{titulo: String, accion: String, estado: Number}]
+    acciones: [{titulo: String, accion: String, estado: Number}],
+    involucrados: [{nombre: String, apellido: String, rol: String, identifier: Schema.ObjectId, _id: false}],
 
 });
 

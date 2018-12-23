@@ -35,10 +35,8 @@ router.post('/api/proyectos/', function(req, res, next) {
     console.log(req.body);
     const {_id} = req.body;
     const usuario = await User.findOne({_id: _id});
-
-    console.log(usuario.proyectosInvolucrado)
     const proyectos = await proyecto.find({_id: {$in: usuario.proyectosInvolucrado}});
-    console.log(proyectos);
+    //console.log(proyectos);
     res.json({proyectos: proyectos , auth: 'true'});
   })(req, res, next);
 });
@@ -70,19 +68,15 @@ router.post('/api/crearproyecto', function(req, res, next) {
     if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
     //Succes:
     console.log(req.body);
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance} = req.body;
-    const proyectoAñadir = new proyecto({titulo,descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance});
-    //const proyectoAñadirId = proyectoAñadir._id;
-    //await proyectoAñadir.save();
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,involucrados} = req.body;
+    const proyectoAñadir = new proyecto({titulo,descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,involucrados});
     await proyectoAñadir.save(async function(err,proyectoGuardado) {
-      console.log(proyectoGuardado.id);
+      //console.log(proyectoGuardado.id);
       proyectoGuardadoId = proyectoGuardado.id;
       //Ligar el proyecto al usuario
       var usuarioUpdated = await User.findOne({_id: creadorId});
-      //const obj = {proyectId: proyectoGuardadoId}
       usuarioUpdated.proyectosInvolucrado.push(proyectoGuardadoId);
       const us = await User.findByIdAndUpdate(usuarioUpdated._id , usuarioUpdated);
-      console.log(us);
     });
     res.json({auth: 'true', creado: 'true'});
   })(req, res, next);
@@ -108,11 +102,37 @@ router.put('/api/proyectos/:id', function(req, res, next) {
     if (err) {return next(err);}
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones} = req.body;
-    const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones};
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados} = req.body;
+    const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados};
     await proyecto.findByIdAndUpdate(req.params.id, updatedProyect);
     const unproyecto = await proyecto.findById(req.params.id);
     res.json({proyecto: unproyecto , auth: 'true', actualizado: 'true'});
+  })(req, res, next);
+});
+
+
+router.put('/api/proyectosadduser/:id', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,newEmail} = req.body;
+    const emailExists = await User.findOne({email: newEmail});
+    if(emailExists){
+       const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados};
+       var newInvolucrado = {nombre: emailExists.nombre, apellido: emailExists.apellido, identifier: emailExists._id};
+       updatedProyect.involucrados.push(newInvolucrado);
+       await proyecto.findByIdAndUpdate(req.params.id, updatedProyect);
+       updateUserproyect = emailExists;
+       updateUserproyect.proyectosInvolucrado.push(req.params.id);
+       await User.findByIdAndUpdate(emailExists._id, updateUserproyect);
+       const unproyecto = await proyecto.findById(req.params.id);
+       res.json({proyecto: unproyecto , auth: 'true', actualizado: 'true'});
+    }
+    else{
+       res.json({actualizado: 'false'});
+    }
   })(req, res, next);
 });
 
@@ -124,7 +144,11 @@ router.delete('/api/proyectos/:id', function(req, res, next) {
     if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
     //Succes:
     await proyecto.findByIdAndRemove(req.params.id);
-    const updatedProyects = await proyecto.find();
+    const userId = user.id;
+    const usuario = await User.findOne({_id: userId});
+    const updatedProyects = await proyecto.find({_id: {$in: usuario.proyectosInvolucrado}});
+
+    //const updatedProyects = await proyecto.find();
     res.json({eliminado: 'true' , auth: 'true', updatedProyects: updatedProyects});
   })(req, res, next);
 });
