@@ -14,6 +14,7 @@ const proyectSchema = new Schema({
     timeStamp: {type : Date, required: true},
     avance: {type: Number, default: 0, require: true },
     acciones: [{titulo: String, accion: String, estado: Number}],
+    actividades: [{actividad: String, completado: Boolean, subActividades: []}],
     involucrados: [{nombre: String, apellido: String, rol: String, identifier: Schema.ObjectId, _id: false}],
 
 });
