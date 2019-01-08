@@ -54,7 +54,8 @@ app.use(require('./routes/ingresos'));
 
 // connect to database
 const db = 'mongodb://localhost/manage';
-mongoose.connect(db, {
+const awsdb = 'mongodb://admin:admin00@ds151994.mlab.com:51994/manage'
+mongoose.connect(awsdb, {
   useNewUrlParser: true,
   })
   .then (db=> console.log('Conectado a la db')).catch(er=>console.log(err));
