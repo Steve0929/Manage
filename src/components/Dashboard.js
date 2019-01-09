@@ -34,9 +34,9 @@ class Dashboard extends Component{
     if(this.props.authRedux.auth === false) {return <Redirect to = '/registrarme'/>}
     if(this.props.authRedux.auth === null ) {return  (<div className="progress"><div className="indeterminate"></div></div>)} //loading...
     return(
-      <div className="dashcss container ">
+      <div className="dashcss">
         <div className="row">
-          <div className="col s12 m6">
+          <div className="col s12 m6" style={{margin: '30px'}}>
            <Proyectlist proyects = {this.props.proyectsRedux.proyects} delete={this.handleBorrarProyecto}/>
            </div>
           <div className="col s12 m5 offset-m1"> </div>

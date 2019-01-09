@@ -60,6 +60,11 @@ const proyectReducer = (state = initState , action) => {
           return {
           ...state
           }
+    case 'ERROR AL AÑADIR USUARIO':
+          M.toast({html: action.msg});
+          return {
+          ...state
+          }
 
     default:
         return state;

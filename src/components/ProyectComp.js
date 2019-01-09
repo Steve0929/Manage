@@ -7,12 +7,14 @@ import {getProyectById} from './actions/proyectActions'
 import {updateProyect} from './actions/proyectActions'
 import {añadirUsuario} from './actions/proyectActions'
 
-import { Timeline, Icon ,Slider, Spin} from 'antd';
+import { Timeline, Icon ,Slider, Spin, Steps} from 'antd';
 import 'antd/es/timeline/style/index.css';
 import 'antd/es/icon/style/index.css';
 import 'antd/es/slider/style/index.css';
 import 'antd/es/tooltip/style/index.css';
 import 'antd/es/spin/style/index.css';
+import 'antd/es/steps/style/index.css';
+
 
 import {Collapsible, CollapsibleItem, Modal, Button, Row, Col, Tag} from 'react-materialize'
 
@@ -28,15 +30,47 @@ import Slide from '@material-ui/core/Slide';
 import Grow from '@material-ui/core/Grow';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
-import red from '@material-ui/core/colors/red';
-
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {blue, grey, amber, red, purple, indigo, pink, cyan, lightBlue, deepOrange} from '@material-ui/core/colors'
+import createPalette from '@material-ui/core/styles'
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import Grid from '@material-ui/core/Grid';
 
 var id = 'null';
-
 
 // <div className="progress"><div className="indeterminate"></div></div>
 // <button className="btn indigo accent-2 " onClick={(e)=> this.handleUpdate(e, clone)}>Update</button>
 // <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button>
+
+const accent2 = blue.A200
+
+const theme = createMuiTheme({
+  palette: {
+    primary: purple,
+    secondary: {
+      main: '#FF9800',
+    }
+  },
+
+});
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -46,7 +80,25 @@ function TransitionGrow(props) {
   return <Grow {...props} />;
 }
 
-const primary2 = red[500];
+function TabContainer(props) {
+  return (
+    <Typography component="div" style={{ padding: 8 * 3 }}>
+      {props.children}
+    </Typography>
+  );
+}
+
+TabContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const styles = theme => ({
+  root: {
+    backgroundColor: theme.palette.background.paper,
+    width: 500,
+  },
+});
+
 class ProyectComp extends Component{
 
 constructor(props){
@@ -59,10 +111,15 @@ state = {
   tituloAccion: '',
   descrpAccion: '',
   emailAñadir: '',
+  actividadAñadir: '',
+  horasAñadir: '',
   open: false,
   open2: false,
-  left: false
+  open3: false,
+  left: false,
+  tab: 0,
 }
+
 
 handleClickOpen = () => {
     this.setState({ open: true });
@@ -80,6 +137,18 @@ handleClose2 = () => {
    this.setState({ open2: false });
 };
 
+handleClickOpen3 = () => {
+    this.setState({ open3: true });
+  };
+
+handleClose3 = () => {
+   this.setState({ open3: false });
+};
+
+
+handleTabChange = (event, value) => {
+   this.setState({ tab: value });
+ };
 
 componentDidMount(){
   console.log('trying')
@@ -140,6 +209,20 @@ añadirAccioon = (cloneProyect) => (e) => {
   this.setState({tituloAccion: '', descrpAccion: '', open2: false})
 }
 
+añadirActividad = (cloneProyect) => (e) => {
+  console.log('activity');
+  e.preventDefault();
+  var actividad = {actividad: this.state.actividadAñadir, completado: false, subActividades: [], horas: this.state.horasAñadir}
+  cloneProyect.actividades.push(actividad);
+  this.props.updateProyect(cloneProyect);
+  this.handleClose3();
+}
+
+handleCheck = (activity, index, cloneProyect) => (e) => {
+  e.preventDefault();
+  cloneProyect.actividades[index].completado = !activity.completado;
+  this.props.updateProyect(cloneProyect);
+}
 
 removerInvolucrado(){
   console.log('remover');
@@ -150,6 +233,7 @@ toggleDrawer = (side, open) => () => {
       [side]: open,
     });
   };
+
 
 render(){
   console.log(this.props.proyectRedux)
@@ -164,7 +248,10 @@ render(){
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
   return(
-    <div className="container section projectInfo">
+    <div>
+    <Grid container spacing={0}>
+    <Grid item xs={12}>
+    <div  style={{margin: '50px',marginTop: '30px', marginBottom: '0px'}} className="section projectInfo">
       <div className="card z-depth 1">
         <div className="card-content">
           <span className="card-title">{this.props.proyectRedux.titulo} </span>
@@ -174,16 +261,28 @@ render(){
            <Divider/>
           <div style={{display: 'flex', justifyContent: 'left', flexWrap: 'wrap', marginLeft: '10px', marginBottom: '3px'}}>
            {this.props.proyectRedux.involucrados.map(involucrado =>{
+            if(involucrado.identifier == this.props.proyectRedux.creadorId){
+              return (
+                <Chip
+                 key={involucrado.identifier}
+                 icon={<FaceIcon />}
+                 label= {involucrado.nombre+' '+involucrado.apellido}
+                 onDelete={this.removerInvolucrado}
+                 style={{ margin: '15px'}}
+                 color='secondary'
+                 />
+               )}
+            else{
              return (
                <Chip
                 key={involucrado.identifier}
                 icon={<FaceIcon />}
                 label= {involucrado.nombre+' '+involucrado.apellido}
                 onDelete={this.removerInvolucrado}
-                
+
                 style={{ margin: '15px'}}
                 />
-              )
+              )}
            })}
           </div>
         <div className="card-action grey lighten-4 grey-text">
@@ -204,7 +303,6 @@ render(){
                 </DialogActions>
               </Dialog>
 
-
               <Drawer anchor="left" open={this.state.left} onClose={this.toggleDrawer('left', false)}>
                <div
                  tabIndex={0}
@@ -223,57 +321,109 @@ render(){
           <div>
         </div>
       </div>
-    <div style={{ marginTop: '10%'}}></div>
-      <Timeline mode="alternate">
-        <Timeline.Item color='green' dot={<Icon type="rocket" theme="twoTone" style={{ fontSize: '36px' }} />}>
-            <div className="card z-depth 1">
-            <div className="card-content">
-              <span className="card-title">Proyecto creado {date}</span>
-            </div>
-            <div className="card-action grey lighten-4 grey-text">
-              Nombre: {this.props.proyectRedux.titulo}
-            </div>
-            </div>
-        </Timeline.Item>
 
-        {this.props.proyectRedux.acciones.map(accion =>{ //cycle por los proyectos
-          return (
-            <Timeline.Item key={accion._id}>
-              <Collapsible popout defaultActiveKey={1}>
-              <CollapsibleItem header={accion.titulo} icon='filter_drama'>
-                {accion.accion}
-              </CollapsibleItem>
-              </Collapsible>
-            </Timeline.Item>
-          )
-        })}
-
-
-      <Timeline.Item dot={<Icon type="clock-circle-o" style={{ fontSize: '16px' }} />}>Technical testing 2015-09-01</Timeline.Item>
-      </Timeline>
-
-      <button className="btn blue" onClick={this.handleClickOpen2} style={{marginLeft: '15px'}}>Añadir una acción</button>
-       <Dialog open={this.state.open2} onClose={this.handleClose2}  maxWidth={'sm'} fullWidth={true}
-               aria-labelledby="form-dialog-title" TransitionComponent={Transition}>
-         <DialogTitle id="form-dialog-title">Añadir una acción</DialogTitle>
-         <DialogContent style={{padding: '30px'}}>
-           <DialogContentText>
-             Por favor ingresa la información correspondiente.
-           </DialogContentText>
-           <div className="input-field">
-             <label htmlFor="accion"> Acción </label>
-             <input type="text" id="tituloAccion" onChange={this.handleChangeInputAction}/>
-           </div>
-           <div className="input-field">
-             <label htmlFor="descripcion"> Descripción </label>
-             <input type="text" id="descrpAccion" onChange={this.handleChangeInputAction}/>
-           </div>
-         </DialogContent>
-         <DialogActions>
-           <Button onClick={this.añadirAccioon(clone)} color="primary">Añadir</Button>
-         </DialogActions>
-       </Dialog>
+      <Dialog open={this.state.open3} onClose={this.handleClose3} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
+        <DialogTitle id="añadiractv">Añadir una actividad</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Por favor inserta la información de la actividad para añadirla al proyecto.
+          </DialogContentText>
+          <div className="input-field">
+            <label htmlFor="act">Actividad </label>
+            <input type="text" id="actividadAñadir" onChange={this.handleChangeInputAction}/>
+          </div>
+          <div className="input-field">
+            <label htmlFor="horas">Tiempo en horas estimado para ejecutar la actividad</label>
+            <input type="number" min="0" id="horasAñadir" onChange={this.handleChangeInputAction}/>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.añadirActividad(clone)} color="primary">Añadir</Button>
+        </DialogActions>
+      </Dialog>
     </div>
+    </Grid>
+    </Grid>
+
+    <Grid container spacing={0}>
+    <Grid item xs={6}>
+     <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
+          <Paper >
+          Milestones
+          1
+          2
+          3
+          </Paper>
+      </div>
+    </Grid>
+
+    <Grid item xs={6}>
+      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
+      <MuiThemeProvider theme={theme}>
+      <Paper >
+      <AppBar position="static">
+          <Tabs value={this.state.tab} onChange={this.handleTabChange} fullWidth >
+            <Tab label="Todo" />
+            <Tab label="Pendientes" />
+            <Tab label="Completados" />
+          </Tabs>
+      </AppBar>
+          {this.state.tab === 0 && <TabContainer>
+            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+              return (
+              <div key={actividad._id}>
+               <span>
+                <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+                {actividad.actividad}
+                <p style={{float: 'right'}}>Tiempo: {actividad.horas} horas </p></span>
+                <Divider/>
+              </div>
+              )
+            })}
+
+          </TabContainer>}
+          {this.state.tab === 1 && <TabContainer>
+            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+              if(actividad.completado == false){
+                return (
+                <div key={actividad._id}>
+                  <Checkbox
+                   checked={actividad.completado}
+                   onClick={this.handleCheck(actividad,index,clone)}
+                 />
+                 {actividad.actividad}
+                <Divider/>
+                </div>
+                )
+              }
+            })}
+          </TabContainer>}
+          {this.state.tab === 2 && <TabContainer>
+            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+              if(actividad.completado == true){
+                return (
+                <div key={actividad._id}>
+                  <Checkbox
+                   checked={actividad.completado}
+                   onClick={this.handleCheck(actividad,index,clone)}
+                 />
+                 {actividad.actividad}
+                <Divider/>
+                </div>
+                )
+              }
+            })}
+          </TabContainer>}
+      <div className="card-action grey lighten-4 grey-text">
+      <button className="btn indigo accent-2" style={{margin: '15px'}} onClick={this.handleClickOpen3}> Añadir actividad</button>
+      </div>
+      </Paper>
+      </MuiThemeProvider>
+      </div>
+    </Grid>
+ </Grid>
+
+  </div>
   )
 }}
 }

@@ -3,8 +3,16 @@ import {Link} from 'react-router-dom'
 import InLinks from './Inlinks'
 import OutLinks from './OutLinks'
 import {connect} from 'react-redux'
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+
 
 //import {connect} from 'react-redux'
+
 
 const Navbar = (props) =>{
   //console.log(props.authRedux)
@@ -16,12 +24,13 @@ const Navbar = (props) =>{
      links = <InLinks updateNavbarOut={props.updateNavbarOut}/>
   }
   return(
-   <nav className= "nav-wrapper grey darken-3">
+   <nav className= "nav-wrapper blue darken-3">
     <div className="container">
       <Link to= '/dashboard' className="brand-logo"> Proyect manager </Link>
       {links}
     </div>
    </nav>
+
   )
 }
 
