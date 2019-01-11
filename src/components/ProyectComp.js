@@ -171,6 +171,14 @@ handleMenuClose = () => {
 eliminarActividad = (clone) => (e) => {
    console.log('eliminar'+this.state.currentActividadIndex)
    clone.milestones[this.state.currentMilestone].actividades.splice(this.state.currentActividadIndex, 1);
+   var fl = true;
+   for(let i=0; i<clone.milestones[this.state.currentMilestone].actividades.length;i++){
+       if(clone.milestones[this.state.currentMilestone].actividades[i].completado==false){
+          fl=false
+       }
+   }
+   if(fl){clone.milestones[this.state.currentMilestone].completado = true;}
+   else{clone.milestones[this.state.currentMilestone].completado = false;}
    this.props.updateProyect(clone);
    this.setState({currentActividadIndex: '', currentActividad: ''})
  };

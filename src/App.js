@@ -20,12 +20,12 @@ import {
 function ac(props,e){
   console.log(props.pathname.split('/')[1]);
   console.log(props);
+  // <input type="button" onClick={e => ac(window.location, e)} value="What you want to do ?" />
 }
 
 const App = (props) => (
   <Router>
    <div className="App">
-   <input type="button" onClick={e => ac(window.location, e)} value="What you want to do ?" />
     <Navbar/>
     <Route path='/registrarme' component={Register} />
     <Route path='/ingresar' component={Enter} />
