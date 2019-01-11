@@ -128,3 +128,10 @@
 
 ///
 <div  style={{marginTop: '30px'}} className="container section projectInfo">
+
+/////////////
+
+<Ballot color="secondary"/>
+<BallotOutlined color="secondary"/>
+<BallotRounded color="secondary"/>
+<BallotTwoTone color="secondary"/>

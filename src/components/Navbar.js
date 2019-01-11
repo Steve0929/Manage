@@ -10,10 +10,6 @@ import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
-
-//import {connect} from 'react-redux'
-
-
 const Navbar = (props) =>{
   //console.log(props.authRedux)
   var links;
@@ -25,8 +21,8 @@ const Navbar = (props) =>{
   }
   return(
    <nav className= "nav-wrapper blue darken-3">
-    <div className="container">
-      <Link to= '/dashboard' className="brand-logo"> Proyect manager </Link>
+    <div className="containers">
+      <Link to= '/dashboard' style={{marginLeft: '50px'}} className="brand-logo"> Proyect manager </Link>
       {links}
     </div>
    </nav>

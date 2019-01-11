@@ -42,7 +42,7 @@ export const updateProyect = (proyect) =>{
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
-                            acciones: proyect.acciones, involucrados: proyect.involucrados, actividades: proyect.actividades
+                            acciones: proyect.acciones, involucrados: proyect.involucrados, milestones: proyect.milestones
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectos/'+proyect._id, {
@@ -72,7 +72,7 @@ export const añadirUsuario = (proyect, email) =>{
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
                             acciones: proyect.acciones, involucrados: proyect.involucrados, newEmail: email,
-                            actividades: proyect.actividades
+                            milestones: proyect.milestones
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectosadduser/'+proyect._id, {
@@ -94,26 +94,6 @@ export const añadirUsuario = (proyect, email) =>{
       });
     }
 }
-
-/*
-export const getProyects = () =>{
-  return (dispatch, getState) =>{
-    var currentToken = sessionStorage.getItem('accesToken');
-    fetch('http://localhost:3001/api/proyectos', { headers: {'Authorization': currentToken}})
-      .then(res => res.json())
-      .then(data =>{
-        if(data.auth === 'true' && data.proyectos){
-           var proyectos = data.proyectos;
-           dispatch({type: 'GOT PROYECTS', proyectos });
-           }
-        else{
-           dispatch({type: 'NOT LOGGED'});
-           dispatch({type: 'CANT GET PROYECTS'}); //Token is not valid
-        }
-      });
-  }
-}
-*/
 
 
 export const getProyectsOfUser = () =>{

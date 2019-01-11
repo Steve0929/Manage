@@ -18,6 +18,7 @@ import 'antd/es/steps/style/index.css';
 
 import {Collapsible, CollapsibleItem, Modal, Button, Row, Col, Tag} from 'react-materialize'
 
+import Fab from '@material-ui/core/Fab';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
 import TextField from '@material-ui/core/TextField';
@@ -38,7 +39,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import {blue, grey, amber, red, purple, indigo, pink, cyan, lightBlue, deepOrange} from '@material-ui/core/colors'
+import {blue, grey, amber, red, purple, indigo, pink, cyan, lightBlue, deepOrange, teal} from '@material-ui/core/colors'
 import createPalette from '@material-ui/core/styles'
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -53,6 +54,25 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import WorkIcon from '@material-ui/icons/Work';
+import Avatar from '@material-ui/core/Avatar';
+import ImageIcon from '@material-ui/icons/Image';
+import Ballot from '@material-ui/icons/Ballot';
+import BallotOutlined from '@material-ui/icons/BallotOutlined';
+import BallotRounded from '@material-ui/icons/BallotRounded';
+import BallotTwoTone from '@material-ui/icons/BallotTwoTone';
+import Beenhere from '@material-ui/icons/Beenhere';
+import BeenhereTwoTone from '@material-ui/icons/BeenhereTwoTone';
+import EditTwoTone from '@material-ui/icons/EditTwoTone';
+import DeleteForeverTwoTone from '@material-ui/icons/DeleteForeverTwoTone';
+import SettingsTwoTone from '@material-ui/icons/SettingsTwoTone';
+import ExtensionTwoTone from '@material-ui/icons/ExtensionTwoTone';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
 
 var id = 'null';
 
@@ -63,13 +83,27 @@ var id = 'null';
 const accent2 = blue.A200
 
 const theme = createMuiTheme({
+  typography: {
+   useNextVariants: true,
+  },
   palette: {
     primary: purple,
     secondary: {
       main: '#FF9800',
     }
   },
+});
 
+const themeg = createMuiTheme({
+  typography: {
+   useNextVariants: true,
+  },
+  palette: {
+    primary: teal,
+    secondary: {
+      main: '#4DB6AC',
+    }
+  },
 });
 
 function Transition(props) {
@@ -113,12 +147,33 @@ state = {
   emailAñadir: '',
   actividadAñadir: '',
   horasAñadir: '',
+  milestoneAñadir: '',
   open: false,
   open2: false,
   open3: false,
+  open4: false,
   left: false,
   tab: 0,
+  currentMilestone: 0,
+  anchorEl: null,
+  currentActividad: null,
+  currentActividadIndex: null
 }
+
+handleMenuClick  = (actividad,index) => (e) => {
+  this.setState({ anchorEl: e.currentTarget, currentActividadIndex: index, currentActividad: actividad});
+};
+
+handleMenuClose = () => {
+   this.setState({ anchorEl: null });
+ };
+
+eliminarActividad = (clone) => (e) => {
+   console.log('eliminar'+this.state.currentActividadIndex)
+   clone.milestones[this.state.currentMilestone].actividades.splice(this.state.currentActividadIndex, 1);
+   this.props.updateProyect(clone);
+   this.setState({currentActividadIndex: '', currentActividad: ''})
+ };
 
 
 handleClickOpen = () => {
@@ -143,6 +198,14 @@ handleClickOpen3 = () => {
 
 handleClose3 = () => {
    this.setState({ open3: false });
+};
+
+handleClickOpen4 = () => {
+    this.setState({ open4: true });
+  };
+
+handleClose4 = () => {
+   this.setState({ open4: false });
 };
 
 
@@ -212,20 +275,44 @@ añadirAccioon = (cloneProyect) => (e) => {
 añadirActividad = (cloneProyect) => (e) => {
   console.log('activity');
   e.preventDefault();
-  var actividad = {actividad: this.state.actividadAñadir, completado: false, subActividades: [], horas: this.state.horasAñadir}
-  cloneProyect.actividades.push(actividad);
+  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir}
+  cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
+  cloneProyect.milestones[this.state.currentMilestone].completado = false
   this.props.updateProyect(cloneProyect);
   this.handleClose3();
 }
 
 handleCheck = (activity, index, cloneProyect) => (e) => {
   e.preventDefault();
-  cloneProyect.actividades[index].completado = !activity.completado;
+  cloneProyect.milestones[this.state.currentMilestone].actividades[index].completado = !activity.completado;
+  var fl = true;
+  for(let i=0; i<cloneProyect.milestones[this.state.currentMilestone].actividades.length;i++){
+      if(cloneProyect.milestones[this.state.currentMilestone].actividades[i].completado==false){
+         fl=false
+      }
+  }
+
+  if(fl){cloneProyect.milestones[this.state.currentMilestone].completado = true;}
+  else{cloneProyect.milestones[this.state.currentMilestone].completado = false;}
   this.props.updateProyect(cloneProyect);
 }
 
+añadirMilestone = (cloneProyect) => (e) => {
+  e.preventDefault();
+  var milestone = {milestone: this.state.milestoneAñadir, completado: false, actividades: [], horas: 0}
+  cloneProyect.milestones.push(milestone);
+  this.props.updateProyect(cloneProyect);
+  this.handleClose4();
+}
+
+
 removerInvolucrado(){
   console.log('remover');
+}
+
+milestone = (index) => (e) => {
+  console.log('milestone'+index);
+  this.setState({currentMilestone: index});
 }
 
 toggleDrawer = (side, open) => () => {
@@ -236,7 +323,8 @@ toggleDrawer = (side, open) => () => {
 
 
 render(){
-  console.log(this.props.proyectRedux)
+  //console.log(this.props.proyectRedux)
+  const anchorEl = this.state.anchorEl;
   if(this.props.authRedux.auth === false || this.props.authRedux.auth === null ) return <Redirect to = '/'/>
   if(this.props.proyectRedux == [] || this.props.proyectRedux == null )  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
   if(this.props.proyectRedux._id != id)  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
@@ -341,6 +429,22 @@ render(){
           <Button onClick={this.añadirActividad(clone)} color="primary">Añadir</Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={this.state.open4} onClose={this.handleClose4} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
+        <DialogTitle id="añadiractv">Añadir Milestone</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Por favor inserta la información del Milestone.
+          </DialogContentText>
+          <div className="input-field">
+            <label htmlFor="act">Milestone </label>
+            <input type="text" id="milestoneAñadir" onChange={this.handleChangeInputAction}/>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.añadirMilestone(clone)} color="primary">Añadir</Button>
+        </DialogActions>
+      </Dialog>
     </div>
     </Grid>
     </Grid>
@@ -348,14 +452,49 @@ render(){
     <Grid container spacing={0}>
     <Grid item xs={6}>
      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
-          <Paper >
-          Milestones
-          1
-          2
-          3
-          </Paper>
+          <List component="nav" style={{height: '100%', backgroundColor: 'white'}}>
+             <ListItem>
+             <ListItemText primary="Milestones" secondary="Hitos" />
+           </ListItem>
+            {this.props.proyectRedux.milestones.map((milestone, index) =>{ //cycle por las Milestones
+                var completedBadge = null;
+                if(milestone.completado){
+                   if(this.state.currentMilestone == index){completedBadge = <BeenhereTwoTone style={{color:'white'}}/>}
+                   else{completedBadge = <BeenhereTwoTone style={{color:'#4DB6AC'}}/>}
+                }
+                if(this.state.currentMilestone == index){
+                   return(
+                     <div key={milestone._id}>
+                     <ListItem button onClick={this.milestone(index)} style={{backgroundColor: '#B2EBF2'}}>
+                     <BallotTwoTone color="primary"/>
+                     <ListItemText primary={milestone.milestone}/>
+                     {completedBadge}
+                     </ListItem>
+                     <Divider/>
+                     </div>
+                   )
+                }
+                else{
+                return (
+                <div key={milestone._id}>
+                <ListItem button onClick={this.milestone(index)}>
+                <BallotTwoTone color="secondary"/>
+                <ListItemText primary={milestone.milestone}/>
+                {completedBadge}
+                </ListItem>
+                <Divider/>
+                </div>
+              )}
+            })}
+            <button className="btn indigo accent-2" style={{margin: '15px'}} onClick={this.handleClickOpen4}> Añadir Milestone</button>
+          </List>
       </div>
     </Grid>
+
+    <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
+       <MenuItem onClick={this.handleClose}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
+       <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
+     </Menu>
 
     <Grid item xs={6}>
       <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
@@ -368,22 +507,28 @@ render(){
             <Tab label="Completados" />
           </Tabs>
       </AppBar>
-          {this.state.tab === 0 && <TabContainer>
-            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+          {this.state.tab === 0 && clone.milestones.length >0 && <TabContainer>
+            {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               return (
               <div key={actividad._id}>
                <span>
                 <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
                 {actividad.actividad}
-                <p style={{float: 'right'}}>Tiempo: {actividad.horas} horas </p></span>
+                <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
+                        onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
+                        color='primary' size='small'>
+                    <SettingsTwoTone />
+                </IconButton>
+                <p style={{float: 'right'}}>Tiempo: {actividad.horas} horas</p>
+                </span>
                 <Divider/>
               </div>
               )
             })}
 
           </TabContainer>}
-          {this.state.tab === 1 && <TabContainer>
-            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+          {this.state.tab === 1 && clone.milestones.length >0 && <TabContainer>
+            {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               if(actividad.completado == false){
                 return (
                 <div key={actividad._id}>
@@ -398,8 +543,8 @@ render(){
               }
             })}
           </TabContainer>}
-          {this.state.tab === 2 && <TabContainer>
-            {this.props.proyectRedux.actividades.map((actividad, index) =>{ //cycle por las actv
+          {this.state.tab === 2 && clone.milestones.length >0 && <TabContainer>
+            {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               if(actividad.completado == true){
                 return (
                 <div key={actividad._id}>

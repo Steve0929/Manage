@@ -6,7 +6,7 @@ const OutLinks = () =>{
   return(
     <ul className="right">
        <li> <NavLink to='/registrarme'>Registrarse</NavLink> </li>
-       <li> <NavLink to='/ingresar'>Ingresar</NavLink> </li>
+       <li> <NavLink to='/ingresar'style={{marginRight: '50px'}} >Ingresar</NavLink> </li>
      </ul>
   )
 }
