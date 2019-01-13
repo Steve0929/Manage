@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import M from "materialize-css/dist/js/materialize.min.js";
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 class Register extends Component{
   state = {
@@ -33,7 +35,9 @@ class Register extends Component{
 
   render(){
     return(
-      <div className="container ">
+      <Grid container spacing={0} alignItems="center" justify="center" direction="column">
+      <Grid item xs={12} style={{width: '35%'}}>
+      <Paper style={{width: '100%'}}>
          <form onSubmit={this.handleRegistrarme} className="white">
           <h5 className="grey-text text-darken-3"> Registrarse </h5>
           <div className="input-field">
@@ -54,10 +58,14 @@ class Register extends Component{
             <input type="password" id="password" onChange={this.handleChange}/>
           </div>
           <div className="input-field">
+            <div className='center-align'>
             <button className="btn pink lighten-1 z-depth-1"> Registrarme </button>
+            </div>
           </div>
          </form>
-        </div>
+         </Paper>
+         </Grid>
+         </Grid>
     );
   }
 }

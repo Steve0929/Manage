@@ -2,14 +2,20 @@ import React  from 'react';
 import {NavLink} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {logOut} from './actions/authCheck'
+import Button from '@material-ui/core/Button';
 
 const inLinks = (props) =>{
   return(
-    <ul className="right">
-      <li> <NavLink to='/crear'>Nuevo Proyecto</NavLink> </li>
-      <li> <a onClick={props.salir}>Log out</a> </li>
-      <li> <NavLink to='/' className ="btn btn-floating pink light-1">NN</NavLink> </li>
-    </ul>
+    <div>
+       <NavLink style={{ textDecoration: 'none',color: 'white'}}  to='/crear'>
+       <Button style={{textTransform: 'none'}}color="inherit">Nuevo Proyecto</Button>
+       </NavLink>
+
+       <Button style={{textTransform: 'none'}}color="inherit" onClick={props.salir}>Log out</Button>
+
+       <NavLink  style={{ textDecoration: 'none',color: 'white', marginRight: '5px', marginLeft: '10px'}}
+            to='/' className ="btn btn-floating pink light-1">NN</NavLink>
+    </div>
   )
 }
 

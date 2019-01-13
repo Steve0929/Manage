@@ -4,10 +4,15 @@ import Button from '@material-ui/core/Button';
 
 const OutLinks = () =>{
   return(
-    <ul className="right">
-       <li> <NavLink to='/registrarme'>Registrarse</NavLink> </li>
-       <li> <NavLink to='/ingresar'style={{marginRight: '50px'}} >Ingresar</NavLink> </li>
-     </ul>
+    <div>
+      <NavLink style={{ textDecoration: 'none',color: 'white'}}  to='/registrarme'>
+      <Button style={{textTransform: 'none'}}color="inherit">Registrarse</Button>
+      </NavLink>
+
+      <NavLink style={{ textDecoration: 'none',color: 'white'}}  to='/ingresar'>
+      <Button style={{textTransform: 'none'}}color="inherit">Ingresar</Button>
+      </NavLink>
+    </div>
   )
 }
 

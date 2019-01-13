@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import {createProyect} from '../actions/proyectActions'
 import {Redirect} from 'react-router-dom'
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 class CreateProyect extends Component{
   state = {
@@ -24,7 +26,9 @@ class CreateProyect extends Component{
     if(this.props.authRedux.auth === false) return <Redirect to = '/'/>
     if(this.props.authRedux.auth === null) return <Redirect to = '/'/>
     return(
-      <div className="container ">
+      <Grid container spacing={0} alignItems="center" justify="center" direction="column">
+      <Grid item xs={12} style={{width: '50%'}}>
+      <Paper style={{width: '100%'}}>
          <form onSubmit={this.handleCrear} className="white">
           <h5 className="grey-text text-darken-3"> Crear un nuevo proyecto </h5>
             <div className="input-field">
@@ -39,7 +43,9 @@ class CreateProyect extends Component{
             <button className="btn pink lighten-1 z-depth-1"> Crear!</button>
           </div>
          </form>
-        </div>
+         </Paper>
+         </Grid>
+         </Grid>
     );
   }
 }

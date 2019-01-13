@@ -10,7 +10,6 @@ import {getProyectsOfUser} from './actions/proyectActions'
 
 class Dashboard extends Component{
 
-
   componentDidMount(){ //apenas cargue se ejecuta
     console.log('montado');
     //this.props.getProyectsRedux();
@@ -35,6 +34,7 @@ class Dashboard extends Component{
     if(this.props.authRedux.auth === null ) {return  (<div className="progress"><div className="indeterminate"></div></div>)} //loading...
     return(
       <div className="dashcss">
+
         <div className="row">
           <div className="col s12 m6" style={{margin: '30px'}}>
            <Proyectlist proyects = {this.props.proyectsRedux.proyects} delete={this.handleBorrarProyecto}/>

@@ -72,7 +72,12 @@ import SettingsTwoTone from '@material-ui/icons/SettingsTwoTone';
 import ExtensionTwoTone from '@material-ui/icons/ExtensionTwoTone';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import InputBase from '@material-ui/core/InputBase';
 
 var id = 'null';
 
@@ -157,7 +162,10 @@ state = {
   currentMilestone: 0,
   anchorEl: null,
   currentActividad: null,
-  currentActividadIndex: null
+  currentActividadIndex: null,
+  actividadEditando: null,
+  horasEditando: null,
+  editandoActividad: false
 }
 
 handleMenuClick  = (actividad,index) => (e) => {
@@ -180,9 +188,23 @@ eliminarActividad = (clone) => (e) => {
    if(fl){clone.milestones[this.state.currentMilestone].completado = true;}
    else{clone.milestones[this.state.currentMilestone].completado = false;}
    this.props.updateProyect(clone);
-   this.setState({currentActividadIndex: '', currentActividad: ''})
+   this.setState({currentActividadIndex: '', currentActividad: '', anchorEl: null})
  };
 
+editarActividad = (clone) => (e) =>{
+  console.log('editar'+this.state.currentActividadIndex)
+  this.setState({editandoActividad: true, anchorEl: null, actividadEditando: this.state.currentActividad.actividad,
+                horasEditando: this.state.currentActividad.horas})
+}
+
+editarActividad2 = (clone) => (e) =>{
+  var actividadEditada ={actividad:this.state.actividadEditando, horas: this.state.horasEditando ,completado: false}
+  clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex] = actividadEditada;
+  clone.milestones[this.state.currentMilestone].completado = false
+  this.props.updateProyect(clone);
+  this.setState({editandoActividad: false, anchorEl: null, actividadEditando: null, horasEditando: null})
+  console.log('focusout')
+}
 
 handleClickOpen = () => {
     this.setState({ open: true });
@@ -346,12 +368,64 @@ render(){
   return(
     <div>
     <Grid container spacing={0}>
-    <Grid item xs={12}>
+    <Grid item xs={6}>
+
+     <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
+    <Card>
+    <CardHeader
+       action={<IconButton> <MoreVertIcon /></IconButton>}
+       title={this.props.proyectRedux.titulo}
+       subheader={'Creado por '+this.props.proyectRedux.creadorNombre+' '+this.props.proyectRedux.creadorApellido+' '+date}
+     />
+     <CardContent style={{paddingTop: '0px'}}>
+     <Typography component="p" variant='body2' align='justify'>{this.props.proyectRedux.descripcion}</Typography>
+     </CardContent>
+     <Divider/>
+     <CardContent>
+     <div style={{display: 'flex', justifyContent: 'left', flexWrap: 'wrap', marginBottom: '3px'}}>
+      {this.props.proyectRedux.involucrados.map(involucrado =>{
+       if(involucrado.identifier == this.props.proyectRedux.creadorId){
+         return (
+           <Chip
+            key={involucrado.identifier}
+            icon={<FaceIcon />}
+            label= {involucrado.nombre+' '+involucrado.apellido}
+            onDelete={this.removerInvolucrado}
+            style={{ margin: '5px'}}
+            color='secondary'
+            />
+          )}
+       else{
+        return (
+          <Chip
+           key={involucrado.identifier}
+           icon={<FaceIcon />}
+           label= {involucrado.nombre+' '+involucrado.apellido}
+           onDelete={this.removerInvolucrado}
+
+           style={{ margin: '5px'}}
+           />
+         )}
+      })}
+     </div>
+     </CardContent>
+     <Divider/>
+     <CardActions>
+     <button className="btn blue" style={{margin: '15px'}} onClick={this.handleClickOpen}>
+             <i className="material-icons">person_add</i></button>
+     <span className='new badge blue' data-badge-caption=''> {this.props.proyectRedux.avance}% </span>
+      </CardActions>
+      </Card>
+    </div>
+
+
     <div  style={{margin: '50px',marginTop: '30px', marginBottom: '0px'}} className="section projectInfo">
       <div className="card z-depth 1">
         <div className="card-content">
           <span className="card-title">{this.props.proyectRedux.titulo} </span>
+          <Typography align='justify' variant='subheading'>
            <span className="card-title">{this.props.proyectRedux.descripcion} </span>
+           </Typography>
            <Slider defaultValue= {this.props.proyectRedux.avance} key={this.props.proyectRedux.avance}
                     onChange={this.onChange} onAfterChange={(value)=>this.onAfterChange(value, clone)} /> </div>
            <Divider/>
@@ -418,6 +492,7 @@ render(){
         </div>
       </div>
 
+
       <Dialog open={this.state.open3} onClose={this.handleClose3} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
         <DialogTitle id="añadiractv">Añadir una actividad</DialogTitle>
         <DialogContent>
@@ -425,11 +500,11 @@ render(){
             Por favor inserta la información de la actividad para añadirla al proyecto.
           </DialogContentText>
           <div className="input-field">
-            <label htmlFor="act">Actividad </label>
+            <label htmlFor="actividadAñadir">Actividad </label>
             <input type="text" id="actividadAñadir" onChange={this.handleChangeInputAction}/>
           </div>
           <div className="input-field">
-            <label htmlFor="horas">Tiempo en horas estimado para ejecutar la actividad</label>
+            <label htmlFor="horasAñadir">Tiempo en horas estimado para ejecutar la actividad</label>
             <input type="number" min="0" id="horasAñadir" onChange={this.handleChangeInputAction}/>
           </div>
         </DialogContent>
@@ -445,7 +520,7 @@ render(){
             Por favor inserta la información del Milestone.
           </DialogContentText>
           <div className="input-field">
-            <label htmlFor="act">Milestone </label>
+            <label htmlFor="milestoneAñadir">Milestone </label>
             <input type="text" id="milestoneAñadir" onChange={this.handleChangeInputAction}/>
           </div>
         </DialogContent>
@@ -455,9 +530,9 @@ render(){
       </Dialog>
     </div>
     </Grid>
-    </Grid>
 
-    <Grid container spacing={0}>
+
+
     <Grid item xs={6}>
      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
           <List component="nav" style={{height: '100%', backgroundColor: 'white'}}>
@@ -497,14 +572,14 @@ render(){
             <button className="btn indigo accent-2" style={{margin: '15px'}} onClick={this.handleClickOpen4}> Añadir Milestone</button>
           </List>
       </div>
-    </Grid>
+
 
     <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
-       <MenuItem onClick={this.handleClose}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
+       <MenuItem onClick={this.editarActividad(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
        <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
      </Menu>
 
-    <Grid item xs={6}>
+
       <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
       <MuiThemeProvider theme={theme}>
       <Paper >
@@ -517,17 +592,24 @@ render(){
       </AppBar>
           {this.state.tab === 0 && clone.milestones.length >0 && <TabContainer>
             {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
+              if(this.state.currentActividadIndex == index && this.state.editandoActividad){
+                 var texto = <InputBase onChange={this.handleChangeInputAction} id='actividadEditando' autoFocus={true}
+                              onBlur={this.editarActividad2(clone)} defaultValue= {actividad.actividad} />
+              }
+              else{
+                var texto = actividad.actividad;
+              }
               return (
               <div key={actividad._id}>
                <span>
                 <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
-                {actividad.actividad}
+                {texto}
                 <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
                         onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
                         color='primary' size='small'>
                     <SettingsTwoTone />
                 </IconButton>
-                <p style={{float: 'right'}}>Tiempo: {actividad.horas} horas</p>
+                <p style={{float: 'right'}}>Tiempo: {actividad.horas}h</p>
                 </span>
                 <Divider/>
               </div>
@@ -574,8 +656,8 @@ render(){
       </MuiThemeProvider>
       </div>
     </Grid>
- </Grid>
 
+ </Grid>
   </div>
   )
 }}
