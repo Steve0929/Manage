@@ -4,6 +4,7 @@ const proyecto = require ('../schemas/proyectos.js');
 require('../passJWT');
 const passport = require ('passport');
 const User = require ('../schemas/users.js');
+var ObjectId = require('mongodb').ObjectID;
 
 router.get('/', (req,res) =>{
   res.json({
@@ -102,8 +103,8 @@ router.put('/api/proyectos/:id', function(req, res, next) {
     if (err) {return next(err);}
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,actividades} = req.body;
-    const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,actividades};
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,milestones} = req.body;
+    const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,milestones};
     await proyecto.findByIdAndUpdate(req.params.id, updatedProyect);
     const unproyecto = await proyecto.findById(req.params.id);
     res.json({proyecto: unproyecto , auth: 'true', actualizado: 'true'});
@@ -117,10 +118,12 @@ router.put('/api/proyectosadduser/:id', function(req, res, next) {
     if (err) {return next(err);}
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,newEmail,actividades} = req.body;
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
+           involucrados,newEmail,milestones} = req.body;
     const emailExists = await User.findOne({email: newEmail});
     if(emailExists){
-       const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,actividades};
+       const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
+                              involucrados,milestones};
        var newInvolucrado = {nombre: emailExists.nombre, apellido: emailExists.apellido, identifier: emailExists._id};
     //  console.log(emailExists._id);
     //  console.log(updatedProyect.involucrados);
@@ -142,6 +145,53 @@ router.put('/api/proyectosadduser/:id', function(req, res, next) {
     }
     else{
        res.json({actualizado: 'false', msg: 'Hubo un problema al añadir el usuario'});
+    }
+  })(req, res, next);
+});
+
+router.put('/api/proyectosremoveruser/:id', function(req, res, next) {
+    passport.authenticate('jwt', { session: false }, async function(err, user, info) {
+    //Errors:
+    if (err) {return next(err);}
+    if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
+    //Succes:
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
+           involucrados,newEmail,milestones,proyectId,removerUsuarioId} = req.body;
+    const usuarioRemover = await User.findOne({'_id': ObjectId(removerUsuarioId)});
+    const elProyecto = await proyecto.findOne({'_id': ObjectId(proyectId)});
+
+    if(usuarioRemover){
+       const proyectTmp = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
+                              involucrados,milestones};
+       var usuarioRemoverTmp = {proyectosInvolucrado: usuarioRemover.proyectosInvolucrado};
+
+       if(elProyecto.involucrados.some(item => item.identifier == removerUsuarioId)){
+          var tienePermisos = true;
+          if(tienePermisos){
+            var index =  elProyecto.involucrados.findIndex(item => item.identifier == removerUsuarioId);
+            proyectTmp.involucrados.splice(index, 1);
+            await proyecto.findByIdAndUpdate(proyectId, proyectTmp);
+            //Actualizar user
+            var indexInUser =  usuarioRemover.proyectosInvolucrado.findIndex(item => item._id == proyectId);
+              console.log( usuarioRemoverTmp.proyectosInvolucrado.length);
+            usuarioRemoverTmp.proyectosInvolucrado.splice(indexInUser,1);
+            console.log( usuarioRemoverTmp.proyectosInvolucrado.length);
+            await User.findByIdAndUpdate(removerUsuarioId, usuarioRemoverTmp);
+            const unproyecto = await proyecto.findById(proyectId);
+            res.json({proyecto: unproyecto , auth: 'true', actualizado: 'true'});
+          }
+          else{
+            res.json({actualizado: 'false', msg: 'No tienes permisos para realizar esta acción'});
+          }
+
+       }
+
+       else{
+         res.json({actualizado: 'false', msg: 'El usuario no está vinculado al proyecto'});
+       }
+    }
+    else{
+       res.json({actualizado: 'false', msg: 'Hubo un problema al eliminar el usuario'});
     }
   })(req, res, next);
 });
