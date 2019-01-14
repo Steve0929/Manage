@@ -509,7 +509,7 @@
       key: "getViewBox",
       value: function getViewBox() {
         if (this.props.horizontal) {
-          return "0 0 ".concat(this.getWidth(), " ").concat(this.getHeight());
+          return "0 0 ".concat(this.getWidth(), " ").concat(this.getHeight()-30);
         }
 
         return "0 0 ".concat(this.getHeight(), " ").concat(this.getWidth());
