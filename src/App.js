@@ -8,6 +8,7 @@ import ProyectComp from './components/ProyectComp'
 import Register from './components/loginComponents/Register'
 import Enter from './components/loginComponents/Enter'
 import CreateProyect from './components/loginComponents/CreateProyect'
+import Profile from './components/Profile'
 import './trancss.css'
 import {
   CSSTransition,
@@ -30,6 +31,7 @@ const App = (props) => (
       <TransitionGroup>
         <CSSTransition key={location.pathname.split('/')[1]} timeout={500}
                        classNames={(location.pathname.split('/')[1] == 'proyecto'||
+                                   location.pathname.split('/')[1] == 'perfil'||
                                    location.pathname.split('/')[1] == 'crear') ? 'pageSliderLeft' : 'pageSliderRight' }
                        mountOnEnter={true} unmountOnExit={true}>
           <Switch location={location} >
@@ -37,6 +39,7 @@ const App = (props) => (
              <Route path='/dashboard' component={Dashboard} />
              <Route path='/proyecto/:id' component={ProyectComp} />
              <Route path='/crear' component={CreateProyect} />
+             <Route path='/perfil' component={Profile} />
           </Switch>
         </CSSTransition>
       </TransitionGroup>

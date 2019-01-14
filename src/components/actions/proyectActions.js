@@ -11,7 +11,7 @@ export const createProyect = (proyect, redir) =>{
       var newProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                         creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time, avance: 0,
                         involucrados: involucrado}
-      console.log(newProyect);
+      //console.log(newProyect);
       //async call to post data
       fetch('http://localhost:3001/api/crearproyecto', {
             method: 'POST',
@@ -22,8 +22,10 @@ export const createProyect = (proyect, redir) =>{
       .then(res => res.json())
       .then(data =>{
         if(data.auth === 'true' && data.creado === 'true'){
+           const red = redir;
            dispatch({type: 'PROYECTO CREADO'});
-           redir.push('/dashboard');
+           setTimeout(()=>redir.push('/dashboard'), 500);
+           //redir.push('/dashboard');
            }
         else{
            dispatch({type: 'NOT LOGGED'});
@@ -137,6 +139,7 @@ export const getProyectsOfUser = () =>{
       .then(data =>{
         if(data.auth === 'true' && data.proyectos){
            var proyectos = data.proyectos;
+           console.log(proyectos);
            dispatch({type: 'GOT PROYECTS', proyectos });
            }
         else{
