@@ -1,5 +1,3 @@
-import M from "materialize-css/dist/js/materialize.min.js";
-import { BrowserRouter } from 'react-router-dom'
 
 export const createProyect = (proyect, redir) =>{
   return (dispatch, getState) => {
@@ -38,7 +36,6 @@ export const createProyect = (proyect, redir) =>{
 export const updateProyect = (proyect) =>{
   return (dispatch, getState) => {
       var currentToken = sessionStorage.getItem('accesToken');
-      const time = Date.now();
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
@@ -67,7 +64,6 @@ export const updateProyect = (proyect) =>{
 export const añadirUsuario = (proyect, email) =>{
   return (dispatch, getState) => {
       var currentToken = sessionStorage.getItem('accesToken');
-      const time = Date.now();
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
@@ -76,6 +72,36 @@ export const añadirUsuario = (proyect, email) =>{
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectosadduser/'+proyect._id, {
+            method: 'PUT',
+            body: JSON.stringify(updatedProyect),
+            headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}
+
+      })
+      .then(res => res.json())
+      .then(data =>{
+        if(data.auth === 'true' && data.actualizado === 'true'){
+           const updatedProyect = data.proyecto
+           dispatch({type: 'PROYECTO ACTUALIZADO', updatedProyect});
+           }
+        else{
+           const msg = data.msg
+           dispatch({type: 'ERROR AL AÑADIR USUARIO', msg});
+        }
+      });
+    }
+}
+
+export const removerUsuario = (proyect, idRemover) =>{
+  return (dispatch, getState) => {
+      var currentToken = sessionStorage.getItem('accesToken');
+      var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
+                            creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
+                            creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
+                            acciones: proyect.acciones, involucrados: proyect.involucrados,
+                            milestones: proyect.milestones, proyectId: proyect._id, removerUsuarioId: idRemover
+                            }
+      //async call to post data
+      fetch('http://localhost:3001/api/proyectosremoveruser/'+proyect._id, {
             method: 'PUT',
             body: JSON.stringify(updatedProyect),
             headers: {'Authorization': currentToken, 'Content-Type' : 'application/json', 'Accept': 'application/json'}

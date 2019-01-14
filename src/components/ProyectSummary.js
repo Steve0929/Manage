@@ -1,5 +1,4 @@
-import React, { Component }  from 'react';
-import M from "materialize-css/dist/js/materialize.min.js";
+import React from 'react';
 import moment from 'moment'
 import 'moment/locale/es'
 import { Progress } from 'antd';

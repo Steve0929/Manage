@@ -6,19 +6,11 @@ import 'moment/locale/es'
 import {getProyectById} from './actions/proyectActions'
 import {updateProyect} from './actions/proyectActions'
 import {añadirUsuario} from './actions/proyectActions'
+import {removerUsuario} from './actions/proyectActions'
 
-import { Timeline, Icon ,Slider, Spin, Steps} from 'antd';
-import 'antd/es/timeline/style/index.css';
-import 'antd/es/icon/style/index.css';
-import 'antd/es/slider/style/index.css';
-import 'antd/es/tooltip/style/index.css';
-import 'antd/es/spin/style/index.css';
-import 'antd/es/steps/style/index.css';
+import {Button} from 'react-materialize'
 
-
-import {Collapsible, CollapsibleItem, Modal, Button, Row, Col, Tag} from 'react-materialize'
-
-import Fab from '@material-ui/core/Fab';
+import M from "materialize-css/dist/js/materialize.min.js";
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
 import TextField from '@material-ui/core/TextField';
@@ -32,7 +24,6 @@ import Grow from '@material-ui/core/Grow';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -46,11 +37,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Grid from '@material-ui/core/Grid';
@@ -70,6 +57,7 @@ import EditTwoTone from '@material-ui/icons/EditTwoTone';
 import DeleteForeverTwoTone from '@material-ui/icons/DeleteForeverTwoTone';
 import SettingsTwoTone from '@material-ui/icons/SettingsTwoTone';
 import ExtensionTwoTone from '@material-ui/icons/ExtensionTwoTone';
+import TimerTwoTone from '@material-ui/icons/TimerTwoTone';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Card from '@material-ui/core/Card';
@@ -84,6 +72,7 @@ var id = 'null';
 // <div className="progress"><div className="indeterminate"></div></div>
 // <button className="btn indigo accent-2 " onClick={(e)=> this.handleUpdate(e, clone)}>Update</button>
 // <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button>
+// <MenuItem onClick={this.editarTiempo(clone)}><TimerTwoTone style={{color:'#FF7043'}}/> Editar Tiempo</MenuItem>
 
 const accent2 = blue.A200
 
@@ -165,7 +154,8 @@ state = {
   currentActividadIndex: null,
   actividadEditando: null,
   horasEditando: null,
-  editandoActividad: false
+  editandoActividad: false,
+  editandoTiempo: false
 }
 
 handleMenuClick  = (actividad,index) => (e) => {
@@ -192,18 +182,22 @@ eliminarActividad = (clone) => (e) => {
  };
 
 editarActividad = (clone) => (e) =>{
-  console.log('editar'+this.state.currentActividadIndex)
   this.setState({editandoActividad: true, anchorEl: null, actividadEditando: this.state.currentActividad.actividad,
                 horasEditando: this.state.currentActividad.horas})
 }
 
 editarActividad2 = (clone) => (e) =>{
-  var actividadEditada ={actividad:this.state.actividadEditando, horas: this.state.horasEditando ,completado: false}
+  var actividadEditada ={actividad:this.state.actividadEditando, horas: this.state.horasEditando ,
+                         completado: this.state.currentActividad.completado}
   clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex] = actividadEditada;
-  clone.milestones[this.state.currentMilestone].completado = false
   this.props.updateProyect(clone);
-  this.setState({editandoActividad: false, anchorEl: null, actividadEditando: null, horasEditando: null})
+  this.setState({editandoActividad: false, anchorEl: null, actividadEditando: null, horasEditando: null, editandoTiempo:false})
   console.log('focusout')
+}
+
+editarTiempo = (clone) => (e) =>{
+  this.setState({editandoTiempo: true, anchorEl: null, actividadEditando: this.state.currentActividad.actividad,
+                horasEditando: this.state.currentActividad.horas})
 }
 
 handleClickOpen = () => {
@@ -272,23 +266,7 @@ handleChangeInputAction = (e) =>{
   this.setState({ [e.target.id] : e.target.value})
 }
 
-añadirAccion(e, cloneProyect){
-  e.preventDefault();
-  var newact = {titulo: this.state.tituloAccion, accion: this.state.descrpAccion, estado: '9'}
-  cloneProyect.acciones.push(newact);
-  this.props.updateProyect(cloneProyect);
-  this.setState({tituloAccion: '', descrpAccion: ''})
-}
-
-añadirUsuario(e, cloneProyect){
-  e.preventDefault();
-  var newInvolucrado = this.state.emailAñadir;
-  this.props.añadirUsuario(cloneProyect, newInvolucrado);
-  this.setState({emailAñadir: ''})
-}
-
 añadirUsuarioo = (cloneProyect) => (e) => {
-  console.log('how many times')
   var newInvolucrado = this.state.emailAñadir;
   this.props.añadirUsuario(cloneProyect, newInvolucrado);
   this.setState({emailAñadir: '', open: false })
@@ -305,11 +283,17 @@ añadirAccioon = (cloneProyect) => (e) => {
 añadirActividad = (cloneProyect) => (e) => {
   console.log('activity');
   e.preventDefault();
+  if(cloneProyect.milestones[0] == null){
+    M.toast({html: 'No se seleccionó un Milestone'});
+    this.handleClose3();
+  }
+  else{
   var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir}
   cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
   cloneProyect.milestones[this.state.currentMilestone].completado = false
   this.props.updateProyect(cloneProyect);
   this.handleClose3();
+  }
 }
 
 handleCheck = (activity, index, cloneProyect) => (e) => {
@@ -336,8 +320,10 @@ añadirMilestone = (cloneProyect) => (e) => {
 }
 
 
-removerInvolucrado(){
-  console.log('remover');
+removerInvolucrado = (involucrado, clone) => (e) =>{
+  //clone.involucrados.splice(this.state.currentActividadIndex, 1);//!!!!!!
+  console.log('remover'+involucrado.identifier);
+  this.props.removerUsuario(clone, involucrado.identifier);
 }
 
 milestone = (index) => (e) => {
@@ -361,7 +347,7 @@ render(){
   if(this.props.proyectRedux.timeStamp){
     //console.log(this.props.proyectRedux)
     var clone = JSON.parse(JSON.stringify(this.props.proyectRedux));
-    //console.log(clone);
+    console.log(clone);
     const dateString = this.props.proyectRedux.timeStamp
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
@@ -378,7 +364,7 @@ render(){
        subheader={'Creado por '+this.props.proyectRedux.creadorNombre+' '+this.props.proyectRedux.creadorApellido+' '+date}
      />
      <CardContent style={{paddingTop: '0px'}}>
-     <Typography component="p" variant='body2' align='justify'>{this.props.proyectRedux.descripcion}</Typography>
+     <Typography component="p"  align='justify'>{this.props.proyectRedux.descripcion}</Typography>
      </CardContent>
      <Divider/>
      <CardContent>
@@ -401,7 +387,7 @@ render(){
            key={involucrado.identifier}
            icon={<FaceIcon />}
            label= {involucrado.nombre+' '+involucrado.apellido}
-           onDelete={this.removerInvolucrado}
+           onDelete={this.removerInvolucrado(involucrado, clone)}
 
            style={{ margin: '5px'}}
            />
@@ -418,80 +404,33 @@ render(){
       </Card>
     </div>
 
+          <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
+            <DialogTitle id="form-dialog-title">Añadir un usuario</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Por favor inserta el correo del usuario para añadirlo al proyecto.
+              </DialogContentText>
+              <input type="text" id="emailAñadir" onChange={this.handleChangeInputAction}/>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.añadirUsuarioo(clone)} color="primary">Añadir</Button>
+            </DialogActions>
+          </Dialog>
 
-    <div  style={{margin: '50px',marginTop: '30px', marginBottom: '0px'}} className="section projectInfo">
-      <div className="card z-depth 1">
-        <div className="card-content">
-          <span className="card-title">{this.props.proyectRedux.titulo} </span>
-          <Typography align='justify' variant='subheading'>
-           <span className="card-title">{this.props.proyectRedux.descripcion} </span>
-           </Typography>
-           <Slider defaultValue= {this.props.proyectRedux.avance} key={this.props.proyectRedux.avance}
-                    onChange={this.onChange} onAfterChange={(value)=>this.onAfterChange(value, clone)} /> </div>
-           <Divider/>
-          <div style={{display: 'flex', justifyContent: 'left', flexWrap: 'wrap', marginLeft: '10px', marginBottom: '3px'}}>
-           {this.props.proyectRedux.involucrados.map(involucrado =>{
-            if(involucrado.identifier == this.props.proyectRedux.creadorId){
-              return (
-                <Chip
-                 key={involucrado.identifier}
-                 icon={<FaceIcon />}
-                 label= {involucrado.nombre+' '+involucrado.apellido}
-                 onDelete={this.removerInvolucrado}
-                 style={{ margin: '15px'}}
-                 color='secondary'
-                 />
-               )}
-            else{
-             return (
-               <Chip
-                key={involucrado.identifier}
-                icon={<FaceIcon />}
-                label= {involucrado.nombre+' '+involucrado.apellido}
-                onDelete={this.removerInvolucrado}
-
-                style={{ margin: '15px'}}
-                />
-              )}
-           })}
-          </div>
-        <div className="card-action grey lighten-4 grey-text">
-         <button className="btn blue" style={{marginBottom: '15px'}} onClick={this.handleClickOpen}> <i className="material-icons">person_add</i></button>
-         <span className='new badge blue' data-badge-caption=''> {this.props.proyectRedux.avance}% </span>
-          <div> Creado por: {this.props.proyectRedux.creadorNombre+' '+this.props.proyectRedux.creadorApellido} </div>
-            <div style={{marginBottom: '15px'}}> Creado {date}</div>
-              <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
-                <DialogTitle id="form-dialog-title">Añadir un usuario</DialogTitle>
-                <DialogContent>
-                  <DialogContentText>
-                    Por favor inserta el correo del usuario para añadirlo al proyecto.
-                  </DialogContentText>
-                  <input type="text" id="emailAñadir" onChange={this.handleChangeInputAction}/>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={this.añadirUsuarioo(clone)} color="primary">Añadir</Button>
-                </DialogActions>
-              </Dialog>
-
-              <Drawer anchor="left" open={this.state.left} onClose={this.toggleDrawer('left', false)}>
-               <div
-                 tabIndex={0}
-                 role="button"
-                 onClick={this.toggleDrawer('left', false)}
-                 onKeyDown={this.toggleDrawer('left', false)}
-               >
-               <div className="card z-depth 1">
-                 <div className="card-content">
-                   <span className="card-title">{this.props.proyectRedux.titulo} </span>
-                  </div>
-               </div>
-               </div>
-              </Drawer>
-           </div>
-          <div>
-        </div>
-      </div>
-
+            <Drawer anchor="left" open={this.state.left} onClose={this.toggleDrawer('left', false)}>
+             <div
+               tabIndex={0}
+               role="button"
+               onClick={this.toggleDrawer('left', false)}
+               onKeyDown={this.toggleDrawer('left', false)}
+             >
+             <div className="card z-depth 1">
+               <div className="card-content">
+                 <span className="card-title">{this.props.proyectRedux.titulo} </span>
+                </div>
+             </div>
+             </div>
+            </Drawer>
 
       <Dialog open={this.state.open3} onClose={this.handleClose3} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
         <DialogTitle id="añadiractv">Añadir una actividad</DialogTitle>
@@ -528,9 +467,7 @@ render(){
           <Button onClick={this.añadirMilestone(clone)} color="primary">Añadir</Button>
         </DialogActions>
       </Dialog>
-    </div>
     </Grid>
-
 
 
     <Grid item xs={6}>
@@ -576,6 +513,7 @@ render(){
 
     <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
        <MenuItem onClick={this.editarActividad(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
+
        <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
      </Menu>
 
@@ -599,6 +537,13 @@ render(){
               else{
                 var texto = actividad.actividad;
               }
+              if(this.state.currentActividadIndex == index && this.state.editandoTiempo){
+                 var horas = <InputBase onChange={this.handleChangeInputAction} id='horasEditando' autoFocus={true}
+                              onBlur={this.editarActividad2(clone)} defaultValue= {actividad.horas} />
+              }
+              else{
+                var horas = actividad.horas;
+              }
               return (
               <div key={actividad._id}>
                <span>
@@ -609,7 +554,7 @@ render(){
                         color='primary' size='small'>
                     <SettingsTwoTone />
                 </IconButton>
-                <p style={{float: 'right'}}>Tiempo: {actividad.horas}h</p>
+                <p style={{float: 'right'}}>Tiempo: {horas}h</p>
                 </span>
                 <Divider/>
               </div>
@@ -620,14 +565,33 @@ render(){
           {this.state.tab === 1 && clone.milestones.length >0 && <TabContainer>
             {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               if(actividad.completado == false){
+                if(this.state.currentActividadIndex == index && this.state.editandoActividad){
+                   var texto = <InputBase onChange={this.handleChangeInputAction} id='actividadEditando' autoFocus={true}
+                                onBlur={this.editarActividad2(clone)} defaultValue= {actividad.actividad} />
+                }
+                else{
+                  var texto = actividad.actividad;
+                }
+                if(this.state.currentActividadIndex == index && this.state.editandoTiempo){
+                   var horas = <InputBase onChange={this.handleChangeInputAction} id='horasEditando' autoFocus={true}
+                                onBlur={this.editarActividad2(clone)} defaultValue= {actividad.horas} />
+                }
+                else{
+                  var horas = actividad.horas;
+                }
                 return (
                 <div key={actividad._id}>
-                  <Checkbox
-                   checked={actividad.completado}
-                   onClick={this.handleCheck(actividad,index,clone)}
-                 />
-                 {actividad.actividad}
-                <Divider/>
+                 <span>
+                  <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+                  {texto}
+                  <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
+                          onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
+                          color='primary' size='small'>
+                      <SettingsTwoTone />
+                  </IconButton>
+                  <p style={{float: 'right'}}>Tiempo: {horas}h</p>
+                  </span>
+                  <Divider/>
                 </div>
                 )
               }
@@ -636,14 +600,33 @@ render(){
           {this.state.tab === 2 && clone.milestones.length >0 && <TabContainer>
             {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               if(actividad.completado == true){
+                if(this.state.currentActividadIndex == index && this.state.editandoActividad){
+                   var texto = <InputBase onChange={this.handleChangeInputAction} id='actividadEditando' autoFocus={true}
+                                onBlur={this.editarActividad2(clone)} defaultValue= {actividad.actividad} />
+                }
+                else{
+                  var texto = actividad.actividad;
+                }
+                if(this.state.currentActividadIndex == index && this.state.editandoTiempo){
+                   var horas = <InputBase onChange={this.handleChangeInputAction} id='horasEditando' autoFocus={true}
+                                onBlur={this.editarActividad2(clone)} defaultValue= {actividad.horas} />
+                }
+                else{
+                  var horas = actividad.horas;
+                }
                 return (
                 <div key={actividad._id}>
-                  <Checkbox
-                   checked={actividad.completado}
-                   onClick={this.handleCheck(actividad,index,clone)}
-                 />
-                 {actividad.actividad}
-                <Divider/>
+                 <span>
+                  <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+                  {texto}
+                  <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
+                          onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
+                          color='primary' size='small'>
+                      <SettingsTwoTone />
+                  </IconButton>
+                  <p style={{float: 'right'}}>Tiempo: {horas}h</p>
+                  </span>
+                  <Divider/>
                 </div>
                 )
               }
@@ -676,6 +659,7 @@ const mapDispatchToProps = (dispatch) =>{
     getProyectByIdRedux: (id) => dispatch(getProyectById(id)),
     updateProyect: (proyect) => dispatch(updateProyect(proyect)),
     añadirUsuario: (proyect, email) => dispatch(añadirUsuario(proyect, email)),
+    removerUsuario: (proyect, removerId) => dispatch(removerUsuario(proyect, removerId)),
   }
 }
 

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './index.css';
-import Particles from 'react-particles-js';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Dashboard from './components/Dashboard'
@@ -9,8 +8,6 @@ import ProyectComp from './components/ProyectComp'
 import Register from './components/loginComponents/Register'
 import Enter from './components/loginComponents/Enter'
 import CreateProyect from './components/loginComponents/CreateProyect'
-import {Redirect} from 'react-router-dom'
-import { PageTransition } from 'react-router-page-transition-v2';
 import './trancss.css'
 import {
   CSSTransition,

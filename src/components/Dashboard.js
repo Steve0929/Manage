@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Notifications from './Notifications'
 import Proyectlist from './Proyectlist'
-import M from "materialize-css/dist/js/materialize.min.js";
 import {Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 //import {getProyects} from './actions/proyectActions'
@@ -29,7 +28,7 @@ class Dashboard extends Component{
   }
 
   render(){
-    console.log(this.props);
+    //console.log(this.props);
     if(this.props.authRedux.auth === false) {return <Redirect to = '/registrarme'/>}
     if(this.props.authRedux.auth === null ) {return  (<div className="progress"><div className="indeterminate"></div></div>)} //loading...
     return(

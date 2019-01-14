@@ -1,3 +1,14 @@
+import { Timeline, Icon ,Slider, Spin, Steps} from 'antd';
+import 'antd/es/timeline/style/index.css';
+import 'antd/es/icon/style/index.css';
+import 'antd/es/slider/style/index.css';
+import 'antd/es/tooltip/style/index.css';
+import 'antd/es/spin/style/index.css';
+import 'antd/es/steps/style/index.css';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+
 <div style={{ marginTop: '10%'}}></div>
   <Timeline mode="alternate">
     <Timeline.Item color='green' dot={<Icon type="rocket" theme="twoTone" style={{ fontSize: '36px' }} />}>
