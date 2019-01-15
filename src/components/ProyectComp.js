@@ -7,6 +7,7 @@ import {getProyectById} from './actions/proyectActions'
 import {updateProyect} from './actions/proyectActions'
 import {añadirUsuario} from './actions/proyectActions'
 import {removerUsuario} from './actions/proyectActions'
+import Heat from './Heat'
 
 import {Button} from 'react-materialize'
 
@@ -73,7 +74,6 @@ var id = 'null';
 // <button className="btn indigo accent-2 " onClick={(e)=> this.handleUpdate(e, clone)}>Update</button>
 // <Button onClick={this.toggleDrawer('left', true)}>Open Left</Button>
 // <MenuItem onClick={this.editarTiempo(clone)}><TimerTwoTone style={{color:'#FF7043'}}/> Editar Tiempo</MenuItem>
-
 const accent2 = blue.A200
 
 const theme = createMuiTheme({
@@ -288,7 +288,7 @@ añadirActividad = (cloneProyect) => (e) => {
     this.handleClose3();
   }
   else{
-  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir}
+  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: null}
   cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
   cloneProyect.milestones[this.state.currentMilestone].completado = false
   this.props.updateProyect(cloneProyect);
@@ -298,14 +298,74 @@ añadirActividad = (cloneProyect) => (e) => {
 
 handleCheck = (activity, index, cloneProyect) => (e) => {
   e.preventDefault();
+  console.log(cloneProyect.milestones[this.state.currentMilestone]);
   cloneProyect.milestones[this.state.currentMilestone].actividades[index].completado = !activity.completado;
+  if(cloneProyect.milestones[this.state.currentMilestone].actividades[index].completado==true){
+    cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = Date.now();
+
+    if(cloneProyect.logs[cloneProyect.logs.length-1].timeStamp == null){
+        var log = {timeStamp: new Date(), totalHorasDia: activity.horas, actividades: {actividad: activity.actividad}}
+        cloneProyect.logs.push(log);
+    }
+
+    else{
+      var logdate = moment(cloneProyect.logs[cloneProyect.logs.length-1].timeStamp).toDate();
+      var logdatem = moment(logdate, 'MM-DD-YYYY');
+      var today = new Date();
+      var todaym = moment(today, 'MM-DD-YYYY');
+    // console.log( todaym.isSame(logdatem, 'day'));
+      if(todaym.isSame(logdatem, 'day')){
+         console.log('sumar horas');
+         console.log(cloneProyect.logs[cloneProyect.logs.length-1].totalHorasDia);
+         console.log(activity.horas);
+         cloneProyect.logs[cloneProyect.logs.length-1].totalHorasDia =
+                          cloneProyect.logs[cloneProyect.logs.length-1].totalHorasDia + activity.horas
+         var sameDayAct = {actividad: activity.actividad}
+         cloneProyect.logs[cloneProyect.logs.length-1].actividades.push(sameDayAct)
+      }
+
+      else{
+        var log = {timeStamp: new Date(), totalHorasDia: activity.horas, actividades: activity.actividad}
+        cloneProyect.logs.push(log);
+      }
+    }
+
+  }
+  // se marca como no completada
+  else{
+    cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = null;
+    var logIndex = null
+    var today2 = new Date();
+    var todaym2 = moment(today2, 'MM-DD-YYYY');
+  //  var logIndex = cloneProyect.logs.actividades.findIndex(item=> item.actividad == activity.actividad);
+  //  var logIndex = cloneProyect.logs.findIndex(logitem => logitem.timeStamp.isSame(todaym2, 'day'));
+    for(var key in cloneProyect.logs) {
+        var tmp = cloneProyect.logs[key].timeStamp;
+        if(tmp != null){
+          tmp = moment(tmp).toDate();
+          tmp = moment(tmp, 'MM-DD-YYYY');
+          if (tmp.isSame(todaym2, 'day')) {
+              logIndex = key;
+              break;
+            }
+        }
+    }
+    console.log(logIndex);
+    console.log(cloneProyect.logs[logIndex]);
+    if(logIndex != null){
+      //restar horas trabajadas en el dia
+      cloneProyect.logs[logIndex].totalHorasDia = cloneProyect.logs[logIndex].totalHorasDia - activity.horas;
+      if(cloneProyect.logs[logIndex].totalHorasDia == 0){
+         cloneProyect.logs.splice(logIndex, 1);
+       }
+      }
+  }
   var fl = true;
   for(let i=0; i<cloneProyect.milestones[this.state.currentMilestone].actividades.length;i++){
       if(cloneProyect.milestones[this.state.currentMilestone].actividades[i].completado==false){
          fl=false
       }
   }
-
   if(fl){cloneProyect.milestones[this.state.currentMilestone].completado = true;}
   else{cloneProyect.milestones[this.state.currentMilestone].completado = false;}
   this.props.updateProyect(cloneProyect);
@@ -339,6 +399,7 @@ toggleDrawer = (side, open) => () => {
 
 
 render(){
+
   //console.log(this.props.proyectRedux)
   const anchorEl = this.state.anchorEl;
   if(this.props.authRedux.auth === false || this.props.authRedux.auth === null ) return <Redirect to = '/'/>
@@ -351,13 +412,15 @@ render(){
     const dateString = this.props.proyectRedux.timeStamp
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
+
   return(
     <div>
     <Grid container spacing={0}>
     <Grid item xs={6}>
-
      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
     <Card>
+    <Heat key={this.props.proyectRedux._id+'cc'} logs={this.props.proyectRedux.logs}/>
+    <Divider/>
     <CardHeader
        action={<IconButton> <MoreVertIcon /></IconButton>}
        title={this.props.proyectRedux.titulo}

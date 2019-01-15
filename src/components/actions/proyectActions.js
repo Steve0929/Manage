@@ -10,7 +10,7 @@ export const createProyect = (proyect, redir) =>{
       const involucrado = {nombre: nombre, apellido: apellido, identifier: id}
       var newProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                         creadorNombre: nombre, creadorApellido: apellido, creadorId: id, timeStamp: time, avance: 0,
-                        involucrados: involucrado}
+                        involucrados: involucrado, logs: {timeStamp:null, totalHorasDia: 0 }}
       //console.log(newProyect);
       //async call to post data
       fetch('http://localhost:3001/api/crearproyecto', {
@@ -41,7 +41,8 @@ export const updateProyect = (proyect) =>{
       var updatedProyect = {titulo: proyect.titulo, descripcion: proyect.descripcion,
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
-                            acciones: proyect.acciones, involucrados: proyect.involucrados, milestones: proyect.milestones
+                            acciones: proyect.acciones, involucrados: proyect.involucrados, milestones: proyect.milestones,
+                            logs: proyect.logs
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectos/'+proyect._id, {
@@ -70,7 +71,7 @@ export const añadirUsuario = (proyect, email) =>{
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
                             acciones: proyect.acciones, involucrados: proyect.involucrados, newEmail: email,
-                            milestones: proyect.milestones
+                            milestones: proyect.milestones, logs: proyect.logs
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectosadduser/'+proyect._id, {
@@ -100,7 +101,8 @@ export const removerUsuario = (proyect, idRemover) =>{
                             creadorNombre: proyect.creadorNombre, creadorApellido: proyect.creadorApellido,
                             creadorId: proyect.creadorId, timeStamp: proyect.timeStamp, avance: proyect.avance,
                             acciones: proyect.acciones, involucrados: proyect.involucrados,
-                            milestones: proyect.milestones, proyectId: proyect._id, removerUsuarioId: idRemover
+                            milestones: proyect.milestones, proyectId: proyect._id, removerUsuarioId: idRemover,
+                            logs: proyect.logs
                             }
       //async call to post data
       fetch('http://localhost:3001/api/proyectosremoveruser/'+proyect._id, {
