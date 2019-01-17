@@ -69,9 +69,9 @@ router.post('/api/crearproyecto', function(req, res, next) {
     if (!user) {console.log(info); return res.json({auth: 'false', info: info.name});}
     //Succes:
     console.log(req.body);
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,involucrados,logs} = req.body;
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,involucrados,logs,totalHoras} = req.body;
     const proyectoAñadir = new proyecto({titulo,descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,
-                           involucrados,logs});
+                           involucrados,logs,totalHoras});
     await proyectoAñadir.save(async function(err,proyectoGuardado) {
       //console.log(proyectoGuardado.id);
       proyectoGuardadoId = proyectoGuardado.id;
@@ -104,9 +104,10 @@ router.put('/api/proyectos/:id', function(req, res, next) {
     if (err) {return next(err);}
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,milestones,logs} = req.body;
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,involucrados,milestones,logs,
+          totalHoras,horasCompletadas} = req.body;
     const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
-                            involucrados,milestones,logs};
+                            involucrados,milestones,logs,totalHoras,horasCompletadas};
     await proyecto.findByIdAndUpdate(req.params.id, updatedProyect);
     const unproyecto = await proyecto.findById(req.params.id);
     res.json({proyecto: unproyecto , auth: 'true', actualizado: 'true'});
@@ -121,11 +122,11 @@ router.put('/api/proyectosadduser/:id', function(req, res, next) {
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
     const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
-           involucrados,newEmail,milestones,logs} = req.body;
+           involucrados,newEmail,milestones,logs,totalHoras,horasCompletadas} = req.body;
     const emailExists = await User.findOne({email: newEmail});
     if(emailExists){
        const updatedProyect = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
-                              involucrados,milestones,logs};
+                              involucrados,milestones,logs,totalHoras,horasCompletadas};
        var newInvolucrado = {nombre: emailExists.nombre, apellido: emailExists.apellido, identifier: emailExists._id};
     //  console.log(emailExists._id);
     //  console.log(updatedProyect.involucrados);
@@ -157,14 +158,14 @@ router.put('/api/proyectosremoveruser/:id', function(req, res, next) {
     if (err) {return next(err);}
     if (!user) {console.log(info.name); return res.json({auth: 'false', info: info.name});}
     //Succes:
-    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
-           involucrados,newEmail,milestones,proyectId,removerUsuarioId,logs} = req.body;
+    const {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,horasCompletadas,
+           involucrados,newEmail,milestones,proyectId,removerUsuarioId,logs,totalHoras} = req.body;
     const usuarioRemover = await User.findOne({'_id': ObjectId(removerUsuarioId)});
     const elProyecto = await proyecto.findOne({'_id': ObjectId(proyectId)});
 
     if(usuarioRemover){
        const proyectTmp = {titulo, descripcion,creadorNombre,creadorApellido,creadorId,timeStamp,avance,acciones,
-                              involucrados,milestones,logs};
+                              involucrados,milestones,logs,totalHoras,horasCompletadas};
        var usuarioRemoverTmp = {proyectosInvolucrado: usuarioRemover.proyectosInvolucrado};
 
        if(elProyecto.involucrados.some(item => item.identifier == removerUsuarioId)){
