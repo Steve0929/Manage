@@ -168,6 +168,8 @@ handleMenuClose = () => {
 
 eliminarActividad = (clone) => (e) => {
    console.log('eliminar'+this.state.currentActividadIndex)
+   clone.totalHoras = clone.totalHoras -
+                      clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].horas;
    clone.milestones[this.state.currentMilestone].actividades.splice(this.state.currentActividadIndex, 1);
    var fl = true;
    for(let i=0; i<clone.milestones[this.state.currentMilestone].actividades.length;i++){
@@ -291,6 +293,7 @@ añadirActividad = (cloneProyect) => (e) => {
   var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: null}
   cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
   cloneProyect.milestones[this.state.currentMilestone].completado = false
+  cloneProyect.totalHoras = cloneProyect.totalHoras + eval(this.state.horasAñadir);
   this.props.updateProyect(cloneProyect);
   this.handleClose3();
   }
@@ -302,6 +305,8 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
   cloneProyect.milestones[this.state.currentMilestone].actividades[index].completado = !activity.completado;
   if(cloneProyect.milestones[this.state.currentMilestone].actividades[index].completado==true){
     cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = Date.now();
+    cloneProyect.horasCompletadas = cloneProyect.horasCompletadas + activity.horas;
+    console.log(activity.horas)
 
     if(cloneProyect.logs[cloneProyect.logs.length-1].timeStamp == null){
         var log = {timeStamp: new Date(), totalHorasDia: activity.horas, actividades: {actividad: activity.actividad}}
@@ -325,7 +330,7 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
       }
 
       else{
-        var log = {timeStamp: new Date(), totalHorasDia: activity.horas, actividades: activity.actividad}
+        var log = {timeStamp: new Date(), totalHorasDia: activity.horas, actividades: {actividad: activity.actividad}}
         cloneProyect.logs.push(log);
       }
     }
@@ -333,6 +338,7 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
   }
   // se marca como no completada
   else{
+    cloneProyect.horasCompletadas = cloneProyect.horasCompletadas - activity.horas;
     cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = null;
     var logIndex = null
     var today2 = new Date();
@@ -412,7 +418,7 @@ render(){
     const dateString = this.props.proyectRedux.timeStamp
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
-
+    const percentage = Math.floor((this.props.proyectRedux.horasCompletadas *100)/ this.props.proyectRedux.totalHoras);
   return(
     <div>
     <Grid container spacing={0}>
@@ -462,7 +468,7 @@ render(){
      <CardActions>
      <button className="btn blue" style={{margin: '15px'}} onClick={this.handleClickOpen}>
              <i className="material-icons">person_add</i></button>
-     <span className='new badge blue' data-badge-caption=''> {this.props.proyectRedux.avance}% </span>
+     <span className='new badge blue' data-badge-caption=''> {percentage}% </span>
       </CardActions>
       </Card>
     </div>

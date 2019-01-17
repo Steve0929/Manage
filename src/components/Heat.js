@@ -114,7 +114,6 @@ componentDidMount(){
                 };
               }
             }}
-            showWeekdayLabels={true}
             onClick={value => alert(`Clicked on value with count: ${value.count}`)}
           />
           <ReactTooltip />
