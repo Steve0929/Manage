@@ -33,11 +33,12 @@ class CreateProyect extends Component{
           <h5 className="grey-text text-darken-3"> Crear un nuevo proyecto </h5>
             <div className="input-field">
               <label htmlFor="titulo"> Nombre del proyecto </label>
-              <input type="text" id="titulo" onChange={this.handleChange}/>
+              <input type="text" id="titulo" onChange={this.handleChange} aria-required="true" className="validate" required='true'/>
             </div>
            <div className="input-field">
               <label htmlFor="descripcion">Descripción</label>
-              <textarea id="descripcion" className="materialize-textarea" onChange={this.handleChange} />
+              <textarea id="descripcion" className="materialize-textarea" onChange={this.handleChange}  aria-required="true"
+                        required='true'/>
           </div>
           <div className="input-field">
             <button className="btn pink lighten-1 z-depth-1"> Crear!</button>

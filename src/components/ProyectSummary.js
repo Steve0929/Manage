@@ -12,12 +12,20 @@ const ProyectSummary = (props) =>{
     const dateString = props.proyect.timeStamp
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
+    var percentage = null;
+    if(props.proyect.totalHoras==0){
+       percentage = 0;
+    }
+    else{
+      percentage = Math.floor((props.proyect.horasCompletadas *100)/props.proyect.totalHoras)
+    }
     return(
     <div className="card z-depth-1 overcss">
       <div className="card-content grey-text text-darken-3">
         <span className="card-title">{props.proyect.titulo}</span>
          <Progress percent={props.proyect.avance} showInfo={false} size="small" status="active" />
-         <span className='new badge blue' data-badge-caption=''> {props.proyect.avance}% </span>
+         <span className='new badge blue' data-badge-caption=''> {percentage}% </span>
+          <span className='new badge orange' data-badge-caption=''> {props.proyect.horasCompletadas}h/{props.proyect.totalHoras}h</span>
         <p>Creado por: {props.proyect.creadorNombre+' '+props.proyect.creadorApellido} </p>
         <p className="grey-text">{date} </p>
       </div>

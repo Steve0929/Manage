@@ -170,6 +170,37 @@ eliminarActividad = (clone) => (e) => {
    console.log('eliminar'+this.state.currentActividadIndex)
    clone.totalHoras = clone.totalHoras -
                       clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].horas;
+
+   if(clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].completado == true){
+     clone.horasCompletadas = clone.horasCompletadas -
+                         clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].horas;
+   }
+
+
+   var actdate = moment(clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].timeStamp).toDate();
+   var actdatem = moment(actdate, 'MM-DD-YYYY');
+   var logIndex = null;
+   for(var key in clone.logs) {
+       var tmp = clone.logs[key].timeStamp;
+       if(tmp != null){
+         tmp = moment(tmp).toDate();
+         tmp = moment(tmp, 'MM-DD-YYYY');
+         if (tmp.isSame(actdatem, 'day')) {
+             logIndex = key;
+             break;
+           }
+       }
+   }
+
+   if(logIndex != null){
+     //restar horas trabajadas en el dia
+     clone.logs[logIndex].totalHorasDia = clone.logs[logIndex].totalHorasDia -
+                              clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].horas;
+     if(clone.logs[logIndex].totalHorasDia == 0){
+        clone.logs.splice(logIndex, 1);
+      }
+     }
+
    clone.milestones[this.state.currentMilestone].actividades.splice(this.state.currentActividadIndex, 1);
    var fl = true;
    for(let i=0; i<clone.milestones[this.state.currentMilestone].actividades.length;i++){
@@ -289,8 +320,12 @@ añadirActividad = (cloneProyect) => (e) => {
     M.toast({html: 'No se seleccionó un Milestone'});
     this.handleClose3();
   }
+  if(this.state.actividadAñadir == '' || this.state.horasAñadir==''){
+    M.toast({html: 'Completa toda la información'});
+    this.handleClose3();
+  }
   else{
-  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: null}
+  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: new Date()}
   cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
   cloneProyect.milestones[this.state.currentMilestone].completado = false
   cloneProyect.totalHoras = cloneProyect.totalHoras + eval(this.state.horasAñadir);
@@ -339,25 +374,42 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
   // se marca como no completada
   else{
     cloneProyect.horasCompletadas = cloneProyect.horasCompletadas - activity.horas;
-    cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = null;
+    cloneProyect.milestones[this.state.currentMilestone].actividades[index].timeStamp = new Date();
     var logIndex = null
     var today2 = new Date();
     var todaym2 = moment(today2, 'MM-DD-YYYY');
-  //  var logIndex = cloneProyect.logs.actividades.findIndex(item=> item.actividad == activity.actividad);
-  //  var logIndex = cloneProyect.logs.findIndex(logitem => logitem.timeStamp.isSame(todaym2, 'day'));
+    var actdate = moment(activity.timeStamp).toDate();
+    var actdatem = moment(actdate, 'MM-DD-YYYY');
+
+    /*
+        for(var key in cloneProyect.logs) {
+            var tmp = cloneProyect.logs[key].timeStamp;
+            if(tmp != null){
+              tmp = moment(tmp).toDate();
+              tmp = moment(tmp, 'MM-DD-YYYY');
+              if (tmp.isSame(todaym2, 'day')) {
+                  logIndex = key;
+                  break;
+                }
+            }
+        }
+        */
     for(var key in cloneProyect.logs) {
         var tmp = cloneProyect.logs[key].timeStamp;
         if(tmp != null){
           tmp = moment(tmp).toDate();
           tmp = moment(tmp, 'MM-DD-YYYY');
-          if (tmp.isSame(todaym2, 'day')) {
+              //console.log(tmp);
+              //console.log(actdatem)
+          if (tmp.isSame(actdatem, 'day')) {
               logIndex = key;
               break;
             }
         }
     }
-    console.log(logIndex);
-    console.log(cloneProyect.logs[logIndex]);
+
+    //console.log(logIndex);
+    //console.log(cloneProyect.logs[logIndex]);
     if(logIndex != null){
       //restar horas trabajadas en el dia
       cloneProyect.logs[logIndex].totalHorasDia = cloneProyect.logs[logIndex].totalHorasDia - activity.horas;
@@ -418,7 +470,13 @@ render(){
     const dateString = this.props.proyectRedux.timeStamp
     const dateConFormato = moment(dateString).toDate();
     const date = moment(dateConFormato, 'MM-DD-YYYY').locale("es").calendar();
-    const percentage = Math.floor((this.props.proyectRedux.horasCompletadas *100)/ this.props.proyectRedux.totalHoras);
+    var percentage = null;
+    if(this.props.proyectRedux.totalHoras==0){
+       percentage = 0;
+    }
+    else{
+      percentage = Math.floor((this.props.proyectRedux.horasCompletadas *100)/this.props.proyectRedux.totalHoras)
+    }
   return(
     <div>
     <Grid container spacing={0}>
@@ -509,16 +567,19 @@ render(){
           </DialogContentText>
           <div className="input-field">
             <label htmlFor="actividadAñadir">Actividad </label>
-            <input type="text" id="actividadAñadir" onChange={this.handleChangeInputAction}/>
+            <input type="text" id="actividadAñadir" onChange={this.handleChangeInputAction}  aria-required="true"
+                   required='true'/>
           </div>
           <div className="input-field">
             <label htmlFor="horasAñadir">Tiempo en horas estimado para ejecutar la actividad</label>
-            <input type="number" min="0" id="horasAñadir" onChange={this.handleChangeInputAction}/>
+            <input type="number" min="0" id="horasAñadir" onChange={this.handleChangeInputAction}  aria-required="true"
+                   required='true'/>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.añadirActividad(clone)} color="primary">Añadir</Button>
         </DialogActions>
+
       </Dialog>
 
       <Dialog open={this.state.open4} onClose={this.handleClose4} aria-labelledby="form-dialog-title" TransitionComponent={TransitionGrow}>
