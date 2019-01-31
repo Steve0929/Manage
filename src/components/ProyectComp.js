@@ -59,6 +59,7 @@ import DeleteForeverTwoTone from '@material-ui/icons/DeleteForeverTwoTone';
 import SettingsTwoTone from '@material-ui/icons/SettingsTwoTone';
 import ExtensionTwoTone from '@material-ui/icons/ExtensionTwoTone';
 import TimerTwoTone from '@material-ui/icons/TimerTwoTone';
+import FaceTwoTone from '@material-ui/icons/FaceTwoTone';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Card from '@material-ui/core/Card';
@@ -67,6 +68,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import InputBase from '@material-ui/core/InputBase';
+import Input from '@material-ui/core/Input';
 
 var id = 'null';
 
@@ -150,12 +152,15 @@ state = {
   tab: 0,
   currentMilestone: 0,
   anchorEl: null,
+  anchorElMile: null,
   currentActividad: null,
   currentActividadIndex: null,
   actividadEditando: null,
   horasEditando: null,
+  milestoneEditando: null,
   editandoActividad: false,
-  editandoTiempo: false
+  editandoTiempo: false,
+  editandoMilestone: false,
 }
 
 handleMenuClick  = (actividad,index) => (e) => {
@@ -165,6 +170,16 @@ handleMenuClick  = (actividad,index) => (e) => {
 handleMenuClose = () => {
    this.setState({ anchorEl: null });
  };
+
+ handleMenuClick2  = (index) => (e) => {
+   console.log('milestone'+index);
+   this.setState({ anchorElMile: e.currentTarget});
+   console.log('menu milesotne');
+ };
+
+ handleMenuClose2 = () => {
+    this.setState({ anchorElMile: null });
+  };
 
 eliminarActividad = (clone) => (e) => {
    console.log('eliminar'+this.state.currentActividadIndex)
@@ -226,6 +241,48 @@ editarActividad2 = (clone) => (e) =>{
   this.props.updateProyect(clone);
   this.setState({editandoActividad: false, anchorEl: null, actividadEditando: null, horasEditando: null, editandoTiempo:false})
   console.log('focusout')
+}
+
+editarMilestone = (clone) => (e) =>{
+  var mil = clone.milestones[this.state.currentMilestone].milestone;
+  this.setState({editandoMilestone: true, anchorElMile: null, milestoneEditando: mil})
+}
+
+editarMilestone2 = (clone) => (e) =>{
+  console.log('blur')
+  clone.milestones[this.state.currentMilestone].milestone = this.state.milestoneEditando;
+  this.props.updateProyect(clone);
+  this.setState({editandoMilestone: false, anchorEl: null, milestoneEditando: null})
+}
+
+eliminarMilestone = (clone) => (e) =>{
+  var horas = 0;
+  var completadas = 0;
+  for(var key in clone.milestones[this.state.currentMilestone].actividades) {
+      var tmpAct = clone.milestones[this.state.currentMilestone].actividades[key];
+      if(tmpAct != null){
+         //console.log(tmpAct);
+         horas = horas + tmpAct.horas;
+         if(tmpAct.completado){
+            completadas = completadas + tmpAct.horas;
+         }
+      }
+  }
+
+  clone.totalHoras = clone.totalHoras - horas;
+  clone.horasCompletadas = clone.horasCompletadas - completadas;
+  clone.milestones.splice(this.state.currentMilestone, 1);
+  this.props.updateProyect(clone);
+  this.setState({currentMilestone: 0, anchorElMile: null})
+
+}
+
+sefoc = (clone) => (e) =>{
+  console.log('se focusió')
+  /*
+  clone.milestones[this.state.currentMilestone].milestone = this.state.milestoneEditando;
+  this.props.updateProyect(clone);
+  this.setState({editandoMilestone: false, anchorEl: null, milestoneEditando: null})*/
 }
 
 editarTiempo = (clone) => (e) =>{
@@ -380,7 +437,6 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
     var todaym2 = moment(today2, 'MM-DD-YYYY');
     var actdate = moment(activity.timeStamp).toDate();
     var actdatem = moment(actdate, 'MM-DD-YYYY');
-
     /*
         for(var key in cloneProyect.logs) {
             var tmp = cloneProyect.logs[key].timeStamp;
@@ -460,6 +516,7 @@ render(){
 
   //console.log(this.props.proyectRedux)
   const anchorEl = this.state.anchorEl;
+  const anchorElMile = this.state.anchorElMile;
   if(this.props.authRedux.auth === false || this.props.authRedux.auth === null ) return <Redirect to = '/'/>
   if(this.props.proyectRedux == [] || this.props.proyectRedux == null )  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
   if(this.props.proyectRedux._id != id)  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
@@ -599,25 +656,49 @@ render(){
       </Dialog>
     </Grid>
 
+    <Menu id="simple-menu2" anchorEl={anchorElMile} open={Boolean(anchorElMile)} onClose={this.handleMenuClose2}>
+       <MenuItem  onClick={this.editarMilestone(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
+        <MenuItem ><FaceTwoTone style={{color:'green'}}/> Asignar</MenuItem>
+       <MenuItem onClick={this.eliminarMilestone(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
+     </Menu>
+
+
+    <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
+       <MenuItem onClick={this.editarActividad(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
+       <MenuItem ><FaceTwoTone style={{color:'#448aff'}}/> Asignar</MenuItem>
+       <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
+     </Menu>
 
     <Grid item xs={6}>
      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
+       <Paper >
           <List component="nav" style={{height: '100%', backgroundColor: 'white'}}>
-             <ListItem>
-             <ListItemText primary="Milestones" secondary="Hitos" />
-           </ListItem>
-            {this.props.proyectRedux.milestones.map((milestone, index) =>{ //cycle por las Milestones
+             <ListItem><ListItemText primary="Milestones" secondary="Hitos" /> </ListItem>
+             {this.props.proyectRedux.milestones.map((milestone, index) =>{ //cycle por las Milestones
                 var completedBadge = null;
+
                 if(milestone.completado){
                    if(this.state.currentMilestone == index){completedBadge = <BeenhereTwoTone style={{color:'white'}}/>}
                    else{completedBadge = <BeenhereTwoTone style={{color:'#4DB6AC'}}/>}
                 }
                 if(this.state.currentMilestone == index){
+                   if(this.state.editandoMilestone){
+                      var texto = <InputBase key={index} onChange={this.handleChangeInputAction} id='milestoneEditando'
+                                   autoFocus={true}
+                                   onFocus={this.sefoc(clone)} onBlur={this.editarMilestone2(clone)}
+                                   defaultValue= {milestone.milestone} ref="emailInput" />
+                       }
+                       else{
+                         var texto = milestone.milestone;
+                         // <ListItemText primary={texto}/>
+                       }
+
                    return(
                      <div key={milestone._id}>
                      <ListItem button onClick={this.milestone(index)} style={{backgroundColor: '#B2EBF2'}}>
-                     <BallotTwoTone color="primary"/>
-                     <ListItemText primary={milestone.milestone}/>
+                     <BallotTwoTone color="primary" aria-owns={anchorElMile ? 'simple-menu2' : undefined}
+                                    onClick={this.handleMenuClick2(index)} aria-haspopup="true" />
+                     <ListItemText primary={texto}/>
                      {completedBadge}
                      </ListItem>
                      <Divider/>
@@ -638,15 +719,8 @@ render(){
             })}
             <button className="btn indigo accent-2" style={{margin: '15px'}} onClick={this.handleClickOpen4}> Añadir Milestone</button>
           </List>
+          </Paper >
       </div>
-
-
-    <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
-       <MenuItem onClick={this.editarActividad(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
-
-       <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
-     </Menu>
-
 
       <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
       <MuiThemeProvider theme={theme}>
@@ -658,6 +732,7 @@ render(){
             <Tab label="Completados" />
           </Tabs>
       </AppBar>
+
           {this.state.tab === 0 && clone.milestones.length >0 && <TabContainer>
             {this.props.proyectRedux.milestones[this.state.currentMilestone].actividades.map((actividad, index) =>{ //cycle por las actv
               if(this.state.currentActividadIndex == index && this.state.editandoActividad){
@@ -674,17 +749,34 @@ render(){
               else{
                 var horas = actividad.horas;
               }
+              if(this.state.currentMilestone == index && this.state.editandoMilestone){
+                 var testo = <InputBase onChange={this.handleChangeInputAction} id='milestoneEditando' autoFocus={true}
+                              onBlur={this.editarMilestone2(clone)} defaultValue= {clone.milestones[this.state.currentMilestone].milestone} />
+
+                  }
               return (
               <div key={actividad._id}>
                <span>
+               <Grid container spacing={0}>
+               <Grid item xs>
                 <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+
                 {texto}
+                </Grid>
+                <Grid item xs >
+                  <div style={{marginLeft: '55%'}}>
+                  <Avatar style={{width:30, height: 30, margin: 10}}>+</Avatar>
+                  </div>
+                </Grid>
+                <Grid item xs>
                 <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
                         onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
                         color='primary' size='small'>
                     <SettingsTwoTone />
                 </IconButton>
                 <p style={{float: 'right'}}>Tiempo: {horas}h</p>
+                </Grid>
+                </Grid>
                 </span>
                 <Divider/>
               </div>

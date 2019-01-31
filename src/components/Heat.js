@@ -110,7 +110,7 @@ componentDidMount(){
               }
               else{
                 return {
-                  "data-tip": `${value.real} has count: ${value.horasTrabajadas}`
+                  "data-tip": `${value.real} horas trabajadas: ${value.horasTrabajadas}`
                 };
               }
             }}

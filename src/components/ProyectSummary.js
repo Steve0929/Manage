@@ -23,9 +23,9 @@ const ProyectSummary = (props) =>{
     <div className="card z-depth-1 overcss">
       <div className="card-content grey-text text-darken-3">
         <span className="card-title">{props.proyect.titulo}</span>
-         <Progress percent={props.proyect.avance} showInfo={false} size="small" status="active" />
+         <Progress percent={percentage} showInfo={false} size="small" status="active" />
          <span className='new badge blue' data-badge-caption=''> {percentage}% </span>
-          <span className='new badge orange' data-badge-caption=''> {props.proyect.horasCompletadas}h/{props.proyect.totalHoras}h</span>
+          <span className='new badge teal accent-4' data-badge-caption=''> {props.proyect.horasCompletadas}h/{props.proyect.totalHoras}h</span>
         <p>Creado por: {props.proyect.creadorNombre+' '+props.proyect.creadorApellido} </p>
         <p className="grey-text">{date} </p>
       </div>
