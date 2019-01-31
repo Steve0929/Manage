@@ -44,11 +44,11 @@ router.post('/api/proyectos/', function(req, res, next) {
 
 
 router.get('/api/apocalypse', async(req,res) =>{
-      const proyectos = await proyecto.find();
+      /*const proyectos = await proyecto.find();
       const rr = await proyecto.remove();
       const us = await User.remove();
       console.log(proyectos);
-      res.json(proyectos);
+      res.json(proyectos);*/
 
   }
 )
