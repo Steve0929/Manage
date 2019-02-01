@@ -14,7 +14,7 @@ const proyectSchema = new Schema({
     timeStamp: {type : Date, required: true},
     avance: {type: Number, default: 0, require: true },
     acciones: [{titulo: String, accion: String, estado: Number}],
-    milestones: [{milestone: String, completado: Boolean, horas: Number , actividades: [{actividad: String, horas: Number, completado: Boolean, timeStamp: Date}]}],
+    milestones: [{milestone: String, completado: Boolean, horas: Number , actividades: [{actividad: String, horas: Number, completado: Boolean, timeStamp: Date, asignadoA: String}]}],
     involucrados: [{nombre: String, apellido: String, rol: String, identifier: Schema.ObjectId, _id: false}],
     logs: [{timeStamp: Date, totalHorasDia: Number, actividades: [{actividad: String}]} ],
     totalHoras: {type: Number, default: 0, require: true },
