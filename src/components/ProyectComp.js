@@ -153,6 +153,7 @@ state = {
   currentMilestone: 0,
   anchorEl: null,
   anchorElMile: null,
+  anchorElMenuAsignar: null,
   currentActividad: null,
   currentActividadIndex: null,
   actividadEditando: null,
@@ -163,6 +164,18 @@ state = {
   editandoMilestone: false,
 }
 
+seleccionaUsuario = (clone, usuario) => (e) => {
+  console.log('asignar a'+usuario.nombre+' '+usuario.apellido);
+  clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].asignadoA = usuario.nombre+' '+usuario.apellido;
+  console.log(clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].asignadoA);
+  this.props.updateProyect(clone);
+  this.setState({ anchorElMenuAsignar: null });
+}
+
+activarMenuAsignar = (clone) => (e) =>{
+   this.setState({anchorEl:null, anchorElMile:null, anchorElMenuAsignar: e.currentTarget });
+}
+
 handleMenuClick  = (actividad,index) => (e) => {
   this.setState({ anchorEl: e.currentTarget, currentActividadIndex: index, currentActividad: actividad});
 };
@@ -171,15 +184,19 @@ handleMenuClose = () => {
    this.setState({ anchorEl: null });
  };
 
- handleMenuClick2  = (index) => (e) => {
-   console.log('milestone'+index);
-   this.setState({ anchorElMile: e.currentTarget});
-   console.log('menu milesotne');
- };
+handleMenuClick2  = (index) => (e) => {
+ console.log('milestone'+index);
+ this.setState({ anchorElMile: e.currentTarget});
+ console.log('menu milesotne');
+};
 
- handleMenuClose2 = () => {
-    this.setState({ anchorElMile: null });
-  };
+handleMenuClose2 = () => {
+  this.setState({ anchorElMile: null });
+};
+
+handleMenuClose3 = () => {
+   this.setState({ anchorElMenuAsignar: null });
+ };
 
 eliminarActividad = (clone) => (e) => {
    console.log('eliminar'+this.state.currentActividadIndex)
@@ -236,7 +253,8 @@ editarActividad = (clone) => (e) =>{
 
 editarActividad2 = (clone) => (e) =>{
   var actividadEditada ={actividad:this.state.actividadEditando, horas: this.state.horasEditando ,
-                         completado: this.state.currentActividad.completado}
+                         completado: this.state.currentActividad.completado,
+                         asignadoA: clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex].asignadoA}
   clone.milestones[this.state.currentMilestone].actividades[this.state.currentActividadIndex] = actividadEditada;
   this.props.updateProyect(clone);
   this.setState({editandoActividad: false, anchorEl: null, actividadEditando: null, horasEditando: null, editandoTiempo:false})
@@ -382,7 +400,7 @@ añadirActividad = (cloneProyect) => (e) => {
     this.handleClose3();
   }
   else{
-  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: new Date()}
+  var actividad = {actividad: this.state.actividadAñadir, completado: false, horas: this.state.horasAñadir, timeStamp: new Date(), asignadoA: null}
   cloneProyect.milestones[this.state.currentMilestone].actividades.push(actividad);
   cloneProyect.milestones[this.state.currentMilestone].completado = false
   cloneProyect.totalHoras = cloneProyect.totalHoras + eval(this.state.horasAñadir);
@@ -437,19 +455,7 @@ handleCheck = (activity, index, cloneProyect) => (e) => {
     var todaym2 = moment(today2, 'MM-DD-YYYY');
     var actdate = moment(activity.timeStamp).toDate();
     var actdatem = moment(actdate, 'MM-DD-YYYY');
-    /*
-        for(var key in cloneProyect.logs) {
-            var tmp = cloneProyect.logs[key].timeStamp;
-            if(tmp != null){
-              tmp = moment(tmp).toDate();
-              tmp = moment(tmp, 'MM-DD-YYYY');
-              if (tmp.isSame(todaym2, 'day')) {
-                  logIndex = key;
-                  break;
-                }
-            }
-        }
-        */
+
     for(var key in cloneProyect.logs) {
         var tmp = cloneProyect.logs[key].timeStamp;
         if(tmp != null){
@@ -517,6 +523,7 @@ render(){
   //console.log(this.props.proyectRedux)
   const anchorEl = this.state.anchorEl;
   const anchorElMile = this.state.anchorElMile;
+  const anchorElMenuAsignar = this.state.anchorElMenuAsignar;
   if(this.props.authRedux.auth === false || this.props.authRedux.auth === null ) return <Redirect to = '/'/>
   if(this.props.proyectRedux == [] || this.props.proyectRedux == null )  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
   if(this.props.proyectRedux._id != id)  return  (<div className="progress"><div className="indeterminate"></div></div>) //loading...
@@ -606,8 +613,7 @@ render(){
                tabIndex={0}
                role="button"
                onClick={this.toggleDrawer('left', false)}
-               onKeyDown={this.toggleDrawer('left', false)}
-             >
+               onKeyDown={this.toggleDrawer('left', false)}>
              <div className="card z-depth 1">
                <div className="card-content">
                  <span className="card-title">{this.props.proyectRedux.titulo} </span>
@@ -658,16 +664,25 @@ render(){
 
     <Menu id="simple-menu2" anchorEl={anchorElMile} open={Boolean(anchorElMile)} onClose={this.handleMenuClose2}>
        <MenuItem  onClick={this.editarMilestone(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
-        <MenuItem ><FaceTwoTone style={{color:'green'}}/> Asignar</MenuItem>
+        <MenuItem onClick={this.activarMenuAsignar(clone)}><FaceTwoTone style={{color:'green'}}/> Asignar</MenuItem>
        <MenuItem onClick={this.eliminarMilestone(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
      </Menu>
 
 
     <Menu id="simple-menu" anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={this.handleMenuClose}>
        <MenuItem onClick={this.editarActividad(clone)}><EditTwoTone style={{color:'#4DB6AC'}}/> Editar</MenuItem>
-       <MenuItem ><FaceTwoTone style={{color:'#448aff'}}/> Asignar</MenuItem>
+       <MenuItem onClick={this.activarMenuAsignar(clone)}><FaceTwoTone style={{color:'#448aff'}}/> Asignar</MenuItem>
        <MenuItem onClick={this.eliminarActividad(clone)}><DeleteForeverTwoTone style={{color:'red'}}/> Eliminar</MenuItem>
      </Menu>
+
+     <Menu id="long-menu" anchorEl={anchorElMenuAsignar} open={Boolean(anchorElMenuAsignar)} onClose={this.handleMenuClose3}
+        PaperProps={{style: {maxHeight: 48 * 4.5, width: 200,},}}>
+        {this.props.proyectRedux.involucrados.map(usuario => (
+          <MenuItem key={usuario.nombre+' '+usuario.apellido}  onClick={this.seleccionaUsuario(clone, usuario)}>
+            {usuario.nombre+' '+usuario.apellido}
+          </MenuItem>
+        ))}
+      </Menu>
 
     <Grid item xs={6}>
      <div style={{margin: '30px', padding: theme.spacing.unit * 2}}>
@@ -749,11 +764,12 @@ render(){
               else{
                 var horas = actividad.horas;
               }
-              if(this.state.currentMilestone == index && this.state.editandoMilestone){
-                 var testo = <InputBase onChange={this.handleChangeInputAction} id='milestoneEditando' autoFocus={true}
-                              onBlur={this.editarMilestone2(clone)} defaultValue= {clone.milestones[this.state.currentMilestone].milestone} />
-
-                  }
+              if(actividad.asignadoA != null){
+                 var responsable = actividad.asignadoA;
+              }
+              else{
+                var responsable = 'No asignada'
+              }
               return (
               <div key={actividad._id}>
                <span>
@@ -765,6 +781,7 @@ render(){
                 </Grid>
                 <Grid item xs >
                   <div style={{marginLeft: '55%'}}>
+                  {responsable}
                   <Avatar style={{width:30, height: 30, margin: 10}}>+</Avatar>
                   </div>
                 </Grid>
