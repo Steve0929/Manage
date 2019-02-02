@@ -69,6 +69,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import InputBase from '@material-ui/core/InputBase';
 import Input from '@material-ui/core/Input';
+import Tooltip from '@material-ui/core/Tooltip';
 
 var id = 'null';
 
@@ -588,8 +589,10 @@ render(){
      </CardContent>
      <Divider/>
      <CardActions>
+     <Tooltip title='Vincular usuarios al proyecto'>
      <button className="btn blue" style={{margin: '15px'}} onClick={this.handleClickOpen}>
              <i className="material-icons">person_add</i></button>
+      </Tooltip>
      <span className='new badge blue' data-badge-caption=''> {percentage}% </span>
       </CardActions>
       </Card>
@@ -693,8 +696,14 @@ render(){
                 var completedBadge = null;
 
                 if(milestone.completado){
-                   if(this.state.currentMilestone == index){completedBadge = <BeenhereTwoTone style={{color:'white'}}/>}
-                   else{completedBadge = <BeenhereTwoTone style={{color:'#4DB6AC'}}/>}
+                   if(this.state.currentMilestone == index){
+                      completedBadge =
+                      <Tooltip title='Esta fase ya fue completada'><BeenhereTwoTone style={{color:'white'}}/>
+                      </Tooltip>
+                      }
+                   else{
+                        completedBadge = <Tooltip title='Esta fase ya fue completada'>
+                                         <BeenhereTwoTone style={{color:'#4DB6AC'}}/></Tooltip>}
                 }
                 if(this.state.currentMilestone == index){
                    if(this.state.editandoMilestone){
@@ -711,8 +720,9 @@ render(){
                    return(
                      <div key={milestone._id}>
                      <ListItem button onClick={this.milestone(index)} style={{backgroundColor: '#B2EBF2'}}>
+                     <Tooltip title='Configuracion'>
                      <BallotTwoTone color="primary" aria-owns={anchorElMile ? 'simple-menu2' : undefined}
-                                    onClick={this.handleMenuClick2(index)} aria-haspopup="true" />
+                                    onClick={this.handleMenuClick2(index)} aria-haspopup="true" /></Tooltip>
                      <ListItemText primary={texto}/>
                      {completedBadge}
                      </ListItem>
@@ -766,9 +776,15 @@ render(){
               }
               if(actividad.asignadoA != null){
                  var responsable = actividad.asignadoA;
+                 var iniciales = responsable .split(/(\s)/);
+                 var asig = 'Asignada a: ';
+                 var avatar = <Avatar style={{width:30, height: 30, margin: 10, backgroundColor: '#2196f3', fontSize: '85%'}}>
+                              {iniciales[0].charAt(0)+iniciales[2].charAt(0)}</Avatar>
               }
               else{
                 var responsable = 'No asignada'
+                var avatar = <Avatar style={{width:30, height: 30, margin: 10}}>-</Avatar>
+                var asig = '';
               }
               return (
               <div key={actividad._id}>
@@ -776,21 +792,22 @@ render(){
                <Grid container spacing={0}>
                <Grid item xs>
                 <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
-
                 {texto}
                 </Grid>
                 <Grid item xs >
-                  <div style={{marginLeft: '55%'}}>
-                  {responsable}
-                  <Avatar style={{width:30, height: 30, margin: 10}}>+</Avatar>
+                  <div style={{marginLeft: '100%'}}>
+                  <Tooltip title={asig+responsable} style={{backgroundColor: 'black'}}>
+                  {avatar}</Tooltip>
                   </div>
                 </Grid>
                 <Grid item xs>
+                <Tooltip title='Configuracion'>
                 <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
                         onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
                         color='primary' size='small'>
                     <SettingsTwoTone />
                 </IconButton>
+                </Tooltip>
                 <p style={{float: 'right'}}>Tiempo: {horas}h</p>
                 </Grid>
                 </Grid>
@@ -818,20 +835,46 @@ render(){
                 else{
                   var horas = actividad.horas;
                 }
+                if(actividad.asignadoA != null){
+                   var responsable = actividad.asignadoA;
+                   var iniciales = responsable .split(/(\s)/);
+                   var asig = 'Asignada a: ';
+                   var avatar = <Avatar style={{width:30, height: 30, margin: 10, backgroundColor: '#2196f3', fontSize: '85%'}}>
+                                {iniciales[0].charAt(0)+iniciales[2].charAt(0)}</Avatar>
+                }
+                else{
+                  var responsable = 'No asignada'
+                  var avatar = <Avatar style={{width:30, height: 30, margin: 10}}>-</Avatar>
+                  var asig = '';
+                }
                 return (
-                <div key={actividad._id}>
-                 <span>
-                  <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
-                  {texto}
-                  <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
-                          onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
-                          color='primary' size='small'>
-                      <SettingsTwoTone />
-                  </IconButton>
-                  <p style={{float: 'right'}}>Tiempo: {horas}h</p>
-                  </span>
-                  <Divider/>
-                </div>
+                  <div key={actividad._id}>
+                   <span>
+                   <Grid container spacing={0}>
+                   <Grid item xs>
+                    <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+                    {texto}
+                    </Grid>
+                    <Grid item xs >
+                      <div style={{marginLeft: '100%'}}>
+                      <Tooltip title={asig+responsable} style={{backgroundColor: 'black'}}>
+                      {avatar}</Tooltip>
+                      </div>
+                    </Grid>
+                    <Grid item xs>
+                    <Tooltip title='Configuracion'>
+                    <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
+                            onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
+                            color='primary' size='small'>
+                        <SettingsTwoTone />
+                    </IconButton>
+                    </Tooltip>
+                    <p style={{float: 'right'}}>Tiempo: {horas}h</p>
+                    </Grid>
+                    </Grid>
+                    </span>
+                    <Divider/>
+                  </div>
                 )
               }
             })}
@@ -853,20 +896,46 @@ render(){
                 else{
                   var horas = actividad.horas;
                 }
+                if(actividad.asignadoA != null){
+                   var responsable = actividad.asignadoA;
+                   var iniciales = responsable .split(/(\s)/);
+                   var asig = 'Asignada a: ';
+                   var avatar = <Avatar style={{width:30, height: 30, margin: 10, backgroundColor: '#2196f3', fontSize: '85%'}}>
+                                {iniciales[0].charAt(0)+iniciales[2].charAt(0)}</Avatar>
+                }
+                else{
+                  var responsable = 'No asignada'
+                  var avatar = <Avatar style={{width:30, height: 30, margin: 10}}>-</Avatar>
+                  var asig = '';
+                }
                 return (
-                <div key={actividad._id}>
-                 <span>
-                  <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
-                  {texto}
-                  <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
-                          onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
-                          color='primary' size='small'>
-                      <SettingsTwoTone />
-                  </IconButton>
-                  <p style={{float: 'right'}}>Tiempo: {horas}h</p>
-                  </span>
-                  <Divider/>
-                </div>
+                  <div key={actividad._id}>
+                   <span>
+                   <Grid container spacing={0}>
+                   <Grid item xs>
+                    <Checkbox checked={actividad.completado} onClick={this.handleCheck(actividad,index,clone)}/>
+                    {texto}
+                    </Grid>
+                    <Grid item xs >
+                      <div style={{marginLeft: '100%'}}>
+                      <Tooltip title={asig+responsable} style={{backgroundColor: 'black'}}>
+                      {avatar}</Tooltip>
+                      </div>
+                    </Grid>
+                    <Grid item xs>
+                    <Tooltip title='Configuracion'>
+                    <IconButton aria-owns={anchorEl ? 'simple-menu' : undefined} aria-haspopup="true"
+                            onClick={this.handleMenuClick(actividad, index)} style={{float: 'right'}}
+                            color='primary' size='small'>
+                        <SettingsTwoTone />
+                    </IconButton>
+                    </Tooltip>
+                    <p style={{float: 'right'}}>Tiempo: {horas}h</p>
+                    </Grid>
+                    </Grid>
+                    </span>
+                    <Divider/>
+                  </div>
                 )
               }
             })}
